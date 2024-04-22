@@ -122,4 +122,11 @@ public class ESAPITest {
 		instance.executeSource( "result = encodeForSQL( \"' or '1'='1\", 'mysql', false )", context );
 		assertEquals( "\\' or \\'1\\'\\=\\'1", variables.get( result ) );
 	}
+
+	@DisplayName( "It can encodeFor" )
+	@Test
+	public void testEncodeFor() {
+		instance.executeSource( "result = encodeFor( 'html', '<test>' )", context );
+		assertEquals( "&lt;test&gt;", variables.get( result ) );
+	}
 }
