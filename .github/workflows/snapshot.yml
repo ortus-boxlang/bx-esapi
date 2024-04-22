@@ -1,4 +1,4 @@
-name: @MODULE_NAME@ Snapshots
+name: ESAPI Snapshots
 
 on:
   push:
