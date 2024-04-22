@@ -116,4 +116,10 @@ public class ESAPITest {
 		assertEquals( "&#x27; or 1&#x3d;1", variables.get( result ) );
 	}
 
+	@DisplayName( "It can encode for SQL" )
+	@Test
+	public void testEncodeForSQL() {
+		instance.executeSource( "result = encodeForSQL( \"' or '1'='1\", 'mysql', false )", context );
+		assertEquals( "\\' or \\'1\\'\\=\\'1", variables.get( result ) );
+	}
 }

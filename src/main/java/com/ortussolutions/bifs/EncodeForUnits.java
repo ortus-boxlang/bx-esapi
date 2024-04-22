@@ -31,7 +31,6 @@ import ortus.boxlang.runtime.types.Argument;
 @BoxBIF( alias = "encodeForHTMLAttribute" )
 @BoxBIF( alias = "encodeForJavaScript" )
 @BoxBIF( alias = "encodeForLDAP" )
-@BoxBIF( alias = "encodeForSQL" )
 @BoxBIF( alias = "encodeForURL" )
 @BoxBIF( alias = "encodeForXML" )
 @BoxBIF( alias = "encodeForXMLAttribute" )
