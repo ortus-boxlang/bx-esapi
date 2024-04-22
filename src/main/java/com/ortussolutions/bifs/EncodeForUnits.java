@@ -24,6 +24,7 @@ import ortus.boxlang.runtime.context.IBoxContext;
 import ortus.boxlang.runtime.scopes.ArgumentsScope;
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.types.Argument;
+import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
 
 @BoxBIF( alias = "encodeForCSS" )
 @BoxBIF( alias = "encodeForDN" )
@@ -114,8 +115,7 @@ public class EncodeForUnits extends BIF {
 			try {
 				return encoder.encodeForURL( str );
 			} catch ( EncodingException e ) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new BoxRuntimeException( e.toString() );
 			}
 		}
 
