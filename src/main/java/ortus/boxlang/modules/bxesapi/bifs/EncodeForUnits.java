@@ -12,7 +12,7 @@
  * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package com.ortussolutions.bifs;
+package ortus.boxlang.modules.bxesapi.bifs;
 
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.Encoder;
@@ -69,9 +69,9 @@ public class EncodeForUnits extends BIF {
 	 *
 	 * @param context   The context in which the BIF is being invoked.
 	 * @param arguments Argument scope for the BIF.
-	 * 
+	 *
 	 * @argument.string The string to encode.
-	 * 
+	 *
 	 * @argument.canonicalize Whether to canonicalize the string before encoding.
 	 */
 	public String _invoke( IBoxContext context, ArgumentsScope arguments ) {

@@ -1,7 +1,7 @@
 {
   "ASTType" : "BoxScript",
   "ASTPackage" : "ortus.boxlang.compiler.ast",
-  "sourceText" : "result = encodeFor( 'html', '<test>' )",
+  "sourceText" : "result = encodeForLDAP('grant) (| (password = * ) )')",
   "position" : {
     "start" : {
       "line" : 1,
@@ -9,13 +9,13 @@
     },
     "end" : {
       "line" : 1,
-      "column" : 37
+      "column" : 52
     }
   },
   "statements" : [ {
     "ASTType" : "BoxExpressionStatement",
     "ASTPackage" : "ortus.boxlang.compiler.ast.statement",
-    "sourceText" : "result = encodeFor( 'html', '<test>' )",
+    "sourceText" : "result = encodeForLDAP('grant) (| (password = * ) )')",
     "position" : {
       "start" : {
         "line" : 1,
@@ -23,13 +23,13 @@
       },
       "end" : {
         "line" : 1,
-        "column" : 37
+        "column" : 52
       }
     },
     "expression" : {
       "ASTType" : "BoxAssignment",
       "ASTPackage" : "ortus.boxlang.compiler.ast.expression",
-      "sourceText" : "result = encodeFor( 'html', '<test>' )",
+      "sourceText" : "result = encodeForLDAP('grant) (| (password = * ) )')",
       "position" : {
         "start" : {
           "line" : 1,
@@ -37,7 +37,7 @@
         },
         "end" : {
           "line" : 1,
-          "column" : 37
+          "column" : 52
         }
       },
       "modifiers" : [ ],
@@ -65,7 +65,7 @@
       "right" : {
         "ASTType" : "BoxFunctionInvocation",
         "ASTPackage" : "ortus.boxlang.compiler.ast.expression",
-        "sourceText" : "encodeFor( 'html', '<test>' )",
+        "sourceText" : "encodeForLDAP('grant) (| (password = * ) )')",
         "position" : {
           "start" : {
             "line" : 1,
@@ -73,71 +73,40 @@
           },
           "end" : {
             "line" : 1,
-            "column" : 37
+            "column" : 52
           }
         },
-        "name" : "encodeFor",
+        "name" : "encodeForLDAP",
         "arguments" : [ {
           "ASTType" : "BoxArgument",
           "ASTPackage" : "ortus.boxlang.compiler.ast.expression",
-          "sourceText" : "'html'",
+          "sourceText" : "'grant) (| (password = * ) )'",
           "position" : {
             "start" : {
               "line" : 1,
-              "column" : 20
+              "column" : 23
             },
             "end" : {
               "line" : 1,
-              "column" : 25
+              "column" : 51
             }
           },
           "name" : null,
           "value" : {
             "ASTType" : "BoxStringLiteral",
             "ASTPackage" : "ortus.boxlang.compiler.ast.expression",
-            "sourceText" : "'html'",
+            "sourceText" : "'grant) (| (password = * ) )'",
             "position" : {
               "start" : {
                 "line" : 1,
-                "column" : 20
+                "column" : 23
               },
               "end" : {
                 "line" : 1,
-                "column" : 25
+                "column" : 51
               }
             },
-            "value" : "html"
-          }
-        }, {
-          "ASTType" : "BoxArgument",
-          "ASTPackage" : "ortus.boxlang.compiler.ast.expression",
-          "sourceText" : "'<test>'",
-          "position" : {
-            "start" : {
-              "line" : 1,
-              "column" : 28
-            },
-            "end" : {
-              "line" : 1,
-              "column" : 35
-            }
-          },
-          "name" : null,
-          "value" : {
-            "ASTType" : "BoxStringLiteral",
-            "ASTPackage" : "ortus.boxlang.compiler.ast.expression",
-            "sourceText" : "'<test>'",
-            "position" : {
-              "start" : {
-                "line" : 1,
-                "column" : 28
-              },
-              "end" : {
-                "line" : 1,
-                "column" : 35
-              }
-            },
-            "value" : "<test>"
+            "value" : "grant) (| (password = * ) )"
           }
         } ]
       }
