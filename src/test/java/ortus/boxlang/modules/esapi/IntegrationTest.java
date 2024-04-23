@@ -1,4 +1,4 @@
-package ortus.boxlang.modules.bxesapi;
+package ortus.boxlang.modules.esapi;
 
 import static com.google.common.truth.Truth.assertThat;
 
