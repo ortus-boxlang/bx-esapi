@@ -62,7 +62,7 @@ public class EncodeForUnits extends BIF {
 	 */
 	public String _invoke( IBoxContext context, ArgumentsScope arguments ) {
 		Key		bifMethodKey	= arguments.getAsKey( BIF.__functionName );
-		String	str				= arguments.getAsString( Key.string );
+		String	str				= arguments.getAsString( Key.string ).trim();
 		boolean	canonicalize	= arguments.getAsBoolean( Key.canonicalize );
 
 		// Get the ESAPI encoder
@@ -73,48 +73,30 @@ public class EncodeForUnits extends BIF {
 			str = encoder.canonicalize( str );
 		}
 
-		if ( bifMethodKey.equals( KeyDirectory.encodeForCSS ) ) {
-			return encoder.encodeForCSS( str );
-		}
-
-		if ( bifMethodKey.equals( KeyDirectory.encodeForDN ) ) {
-			return encoder.encodeForDN( str );
-		}
-
-		if ( bifMethodKey.equals( KeyDirectory.encodeForHTML ) ) {
-			return encoder.encodeForHTML( str );
-		}
-
-		if ( bifMethodKey.equals( KeyDirectory.encodeForHTMLAttribute ) ) {
-			return encoder.encodeForHTMLAttribute( str );
-		}
-
-		if ( bifMethodKey.equals( KeyDirectory.encodeForJavaScript ) ) {
-			return encoder.encodeForJavaScript( str );
-		}
-
-		if ( bifMethodKey.equals( KeyDirectory.encodeForLDAP ) ) {
-			return encoder.encodeForLDAP( str );
-		}
-
-		if ( bifMethodKey.equals( KeyDirectory.encodeForURL ) ) {
-			try {
+		try {
+			if ( bifMethodKey.equals( KeyDirectory.encodeForCSS ) ) {
+				return encoder.encodeForCSS( str );
+			} else if ( bifMethodKey.equals( KeyDirectory.encodeForDN ) ) {
+				return encoder.encodeForDN( str );
+			} else if ( bifMethodKey.equals( KeyDirectory.encodeForHTML ) ) {
+				return encoder.encodeForHTML( str );
+			} else if ( bifMethodKey.equals( KeyDirectory.encodeForHTMLAttribute ) ) {
+				return encoder.encodeForHTMLAttribute( str );
+			} else if ( bifMethodKey.equals( KeyDirectory.encodeForJavaScript ) ) {
+				return encoder.encodeForJavaScript( str );
+			} else if ( bifMethodKey.equals( KeyDirectory.encodeForLDAP ) ) {
+				return encoder.encodeForLDAP( str );
+			} else if ( bifMethodKey.equals( KeyDirectory.encodeForURL ) ) {
 				return encoder.encodeForURL( str );
-			} catch ( EncodingException e ) {
-				throw new BoxRuntimeException( e.toString() );
+			} else if ( bifMethodKey.equals( KeyDirectory.encodeForXML ) ) {
+				return encoder.encodeForXML( str );
+			} else if ( bifMethodKey.equals( KeyDirectory.encodeForXMLAttribute ) ) {
+				return encoder.encodeForXMLAttribute( str );
+			} else if ( bifMethodKey.equals( KeyDirectory.encodeForXPath ) ) {
+				return encoder.encodeForXPath( str );
 			}
-		}
-
-		if ( bifMethodKey.equals( KeyDirectory.encodeForXML ) ) {
-			return encoder.encodeForXML( str );
-		}
-
-		if ( bifMethodKey.equals( KeyDirectory.encodeForXMLAttribute ) ) {
-			return encoder.encodeForXMLAttribute( str );
-		}
-
-		if ( bifMethodKey.equals( KeyDirectory.encodeForXPath ) ) {
-			return encoder.encodeForXPath( str );
+		} catch ( EncodingException e ) {
+			throw new BoxRuntimeException( e.toString() );
 		}
 
 		return null;

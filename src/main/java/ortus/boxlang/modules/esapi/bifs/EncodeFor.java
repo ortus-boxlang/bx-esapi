@@ -14,6 +14,9 @@
  */
 package ortus.boxlang.modules.esapi.bifs;
 
+import java.util.List;
+import java.util.Set;
+
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.Encoder;
 
@@ -25,9 +28,14 @@ import ortus.boxlang.runtime.scopes.ArgumentsScope;
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.types.Argument;
 import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
+import ortus.boxlang.runtime.validation.Validator;
 
 @BoxBIF
 public class EncodeFor extends BIF {
+
+	private static final List<String> ENCODING_TYPES = List.of(
+	    "css", "dn", "html", "htmlAttribute", "javascript", "ldap", "sql", "url", "xml", "xmlAttribute", "xpath"
+	);
 
 	/**
 	 * Constructor
@@ -35,8 +43,8 @@ public class EncodeFor extends BIF {
 	public EncodeFor() {
 		super();
 		declaredArguments = new Argument[] {
-		    new Argument( true, "string", Key.type ),
-		    new Argument( false, "string", Key.value )
+		    new Argument( true, Argument.STRING, Key.type, Validator.valueOneOf( ENCODING_TYPES.toArray( new String[ 0 ] ) ) ),
+		    new Argument( true, Argument.STRING, Key.value, Set.of( Validator.NON_EMPTY ) )
 		};
 	}
 
@@ -53,56 +61,38 @@ public class EncodeFor extends BIF {
 	 */
 	public String _invoke( IBoxContext context, ArgumentsScope arguments ) {
 		Key		typeKey	= Key.of( arguments.getAsString( Key.type ) );
-		String	str		= arguments.getAsString( Key.value );
+		String	str		= arguments.getAsString( Key.value ).trim();
 
 		// Get the ESAPI encoder
 		Encoder	encoder	= ESAPI.encoder();
 
-		if ( typeKey.equals( KeyDirectory.css ) ) {
-			return encoder.encodeForCSS( str );
-		}
-
-		if ( typeKey.equals( KeyDirectory.dn ) ) {
-			return encoder.encodeForDN( str );
-		}
-
-		if ( typeKey.equals( KeyDirectory.html ) ) {
-			return encoder.encodeForHTML( str );
-		}
-
-		if ( typeKey.equals( KeyDirectory.htmlAttribute ) ) {
-			return encoder.encodeForHTMLAttribute( str );
-		}
-
-		if ( typeKey.equals( KeyDirectory.javascript ) ) {
-			return encoder.encodeForJavaScript( str );
-		}
-
-		if ( typeKey.equals( KeyDirectory.ldap ) ) {
-			return encoder.encodeForLDAP( str );
-		}
-
-		if ( typeKey.equals( KeyDirectory.url ) ) {
-			try {
+		try {
+			if ( typeKey.equals( KeyDirectory.css ) ) {
+				return encoder.encodeForCSS( str );
+			} else if ( typeKey.equals( KeyDirectory.dn ) ) {
+				return encoder.encodeForDN( str );
+			} else if ( typeKey.equals( KeyDirectory.html ) ) {
+				return encoder.encodeForHTML( str );
+			} else if ( typeKey.equals( KeyDirectory.htmlAttribute ) ) {
+				return encoder.encodeForHTMLAttribute( str );
+			} else if ( typeKey.equals( KeyDirectory.javascript ) ) {
+				return encoder.encodeForJavaScript( str );
+			} else if ( typeKey.equals( KeyDirectory.ldap ) ) {
+				return encoder.encodeForLDAP( str );
+			} else if ( typeKey.equals( KeyDirectory.url ) ) {
 				return encoder.encodeForURL( str );
-			} catch ( Exception e ) {
-				throw new BoxRuntimeException( e.toString() );
+			} else if ( typeKey.equals( KeyDirectory.xml ) ) {
+				return encoder.encodeForXML( str );
+			} else if ( typeKey.equals( KeyDirectory.xmlAttribute ) ) {
+				return encoder.encodeForXMLAttribute( str );
+			} else if ( typeKey.equals( KeyDirectory.xPath ) ) {
+				return encoder.encodeForXPath( str );
 			}
+		} catch ( Exception e ) {
+			throw new BoxRuntimeException( e.toString() );
 		}
 
-		if ( typeKey.equals( KeyDirectory.xml ) ) {
-			return encoder.encodeForXML( str );
-		}
-
-		if ( typeKey.equals( KeyDirectory.xmlAttribute ) ) {
-			return encoder.encodeForXMLAttribute( str );
-		}
-
-		if ( typeKey.equals( KeyDirectory.xPath ) ) {
-			return encoder.encodeForXPath( str );
-		}
-
-		return null;
+		return str;
 	}
 
 }

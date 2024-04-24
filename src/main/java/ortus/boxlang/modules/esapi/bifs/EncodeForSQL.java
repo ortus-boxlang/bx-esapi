@@ -84,20 +84,14 @@ public class EncodeForSQL extends BIF {
 
 		if ( dialectKey.equals( KeyDirectory.mysql_ansi ) ) {
 			return new MySQLCodec( Mode.ANSI );
-		}
-
-		if ( dialectKey.equals( KeyDirectory.mysql ) ) {
+		} else if ( dialectKey.equals( KeyDirectory.mysql ) ) {
 			return new MySQLCodec( Mode.STANDARD );
-		}
-
-		if ( dialectKey.equals( KeyDirectory.oracle ) ) {
+		} else if ( dialectKey.equals( KeyDirectory.oracle ) ) {
 			return new OracleCodec();
-		}
-
-		if ( dialectKey.equals( KeyDirectory.db2 ) ) {
+		} else if ( dialectKey.equals( KeyDirectory.db2 ) ) {
 			return new DB2Codec();
+		} else {
+			throw new IllegalArgumentException( "Invalid dialect: " + dialect );
 		}
-
-		return null;
 	}
 }
