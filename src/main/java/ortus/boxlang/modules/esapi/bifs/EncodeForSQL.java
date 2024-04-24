@@ -29,6 +29,7 @@ import ortus.boxlang.runtime.context.IBoxContext;
 import ortus.boxlang.runtime.scopes.ArgumentsScope;
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.types.Argument;
+import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
 
 @BoxBIF
 public class EncodeForSQL extends BIF {
@@ -91,7 +92,7 @@ public class EncodeForSQL extends BIF {
 		} else if ( dialectKey.equals( KeyDirectory.db2 ) ) {
 			return new DB2Codec();
 		} else {
-			throw new IllegalArgumentException( "Invalid dialect: " + dialect );
+			throw new BoxRuntimeException( "Invalid dialect: " + dialect );
 		}
 	}
 }
