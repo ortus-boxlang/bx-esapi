@@ -129,4 +129,11 @@ public class ESAPITest {
 		instance.executeSource( "result = encodeFor( 'html', '<test>' )", context );
 		assertEquals( "&lt;test&gt;", variables.get( result ) );
 	}
+
+	@DisplayName( "It can decodeFromURL" )
+	@Test
+	public void testDecodeFromURL() {
+		instance.executeSource( "result = decodeFromURL( 'http%3A%2F%2Fwww.example.com%2F%3Ffoo%3Dbar' )", context );
+		assertEquals( "http://www.example.com/?foo=bar", variables.get( result ) );
+	}
 }
