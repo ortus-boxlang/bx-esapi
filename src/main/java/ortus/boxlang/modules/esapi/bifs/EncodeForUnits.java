@@ -18,6 +18,7 @@ import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.Encoder;
 import org.owasp.esapi.errors.EncodingException;
 
+import ortus.boxlang.modules.esapi.util.KeyDirectory;
 import ortus.boxlang.runtime.bifs.BIF;
 import ortus.boxlang.runtime.bifs.BoxBIF;
 import ortus.boxlang.runtime.context.IBoxContext;
@@ -37,21 +38,6 @@ import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
 @BoxBIF( alias = "encodeForXMLAttribute" )
 @BoxBIF( alias = "encodeForXPath" )
 public class EncodeForUnits extends BIF {
-
-	static final class BIFMethods {
-
-		public static final Key	encodeForCSS			= Key.of( "encodeForCSS" );
-		public static final Key	encodeForDN				= Key.of( "encodeForDN" );
-		public static final Key	encodeForHTML			= Key.of( "encodeForHTML" );
-		public static final Key	encodeForHTMLAttribute	= Key.of( "encodeForHTMLAttribute" );
-		public static final Key	encodeForJavaScript		= Key.of( "encodeForJavaScript" );
-		public static final Key	encodeForLDAP			= Key.of( "encodeForLDAP" );
-		public static final Key	encodeForURL			= Key.of( "encodeForURL" );
-		public static final Key	encodeForXML			= Key.of( "encodeForXML" );
-		public static final Key	encodeForXMLAttribute	= Key.of( "encodeForXMLAttribute" );
-		public static final Key	encodeForXPath			= Key.of( "encodeForXPath" );
-
-	}
 
 	/**
 	 * Constructor
@@ -87,31 +73,31 @@ public class EncodeForUnits extends BIF {
 			str = encoder.canonicalize( str );
 		}
 
-		if ( bifMethodKey.equals( BIFMethods.encodeForCSS ) ) {
+		if ( bifMethodKey.equals( KeyDirectory.encodeForCSS ) ) {
 			return encoder.encodeForCSS( str );
 		}
 
-		if ( bifMethodKey.equals( BIFMethods.encodeForDN ) ) {
+		if ( bifMethodKey.equals( KeyDirectory.encodeForDN ) ) {
 			return encoder.encodeForDN( str );
 		}
 
-		if ( bifMethodKey.equals( BIFMethods.encodeForHTML ) ) {
+		if ( bifMethodKey.equals( KeyDirectory.encodeForHTML ) ) {
 			return encoder.encodeForHTML( str );
 		}
 
-		if ( bifMethodKey.equals( BIFMethods.encodeForHTMLAttribute ) ) {
+		if ( bifMethodKey.equals( KeyDirectory.encodeForHTMLAttribute ) ) {
 			return encoder.encodeForHTMLAttribute( str );
 		}
 
-		if ( bifMethodKey.equals( BIFMethods.encodeForJavaScript ) ) {
+		if ( bifMethodKey.equals( KeyDirectory.encodeForJavaScript ) ) {
 			return encoder.encodeForJavaScript( str );
 		}
 
-		if ( bifMethodKey.equals( BIFMethods.encodeForLDAP ) ) {
+		if ( bifMethodKey.equals( KeyDirectory.encodeForLDAP ) ) {
 			return encoder.encodeForLDAP( str );
 		}
 
-		if ( bifMethodKey.equals( BIFMethods.encodeForURL ) ) {
+		if ( bifMethodKey.equals( KeyDirectory.encodeForURL ) ) {
 			try {
 				return encoder.encodeForURL( str );
 			} catch ( EncodingException e ) {
@@ -119,15 +105,15 @@ public class EncodeForUnits extends BIF {
 			}
 		}
 
-		if ( bifMethodKey.equals( BIFMethods.encodeForXML ) ) {
+		if ( bifMethodKey.equals( KeyDirectory.encodeForXML ) ) {
 			return encoder.encodeForXML( str );
 		}
 
-		if ( bifMethodKey.equals( BIFMethods.encodeForXMLAttribute ) ) {
+		if ( bifMethodKey.equals( KeyDirectory.encodeForXMLAttribute ) ) {
 			return encoder.encodeForXMLAttribute( str );
 		}
 
-		if ( bifMethodKey.equals( BIFMethods.encodeForXPath ) ) {
+		if ( bifMethodKey.equals( KeyDirectory.encodeForXPath ) ) {
 			return encoder.encodeForXPath( str );
 		}
 

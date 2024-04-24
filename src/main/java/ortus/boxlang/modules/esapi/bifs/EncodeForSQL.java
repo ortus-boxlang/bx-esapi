@@ -22,6 +22,7 @@ import org.owasp.esapi.codecs.MySQLCodec;
 import org.owasp.esapi.codecs.MySQLCodec.Mode;
 import org.owasp.esapi.codecs.OracleCodec;
 
+import ortus.boxlang.modules.esapi.util.KeyDirectory;
 import ortus.boxlang.runtime.bifs.BIF;
 import ortus.boxlang.runtime.bifs.BoxBIF;
 import ortus.boxlang.runtime.context.IBoxContext;
@@ -32,15 +33,6 @@ import ortus.boxlang.runtime.types.Argument;
 @BoxBIF
 public class EncodeForSQL extends BIF {
 
-	static final class BIFKeys {
-
-		public static final Key	dialect		= Key.of( "dialect" );
-		public static final Key	mysql_ansi	= Key.of( "mysql_ansi" );
-		public static final Key	mysql		= Key.of( "mysql" );
-		public static final Key	oracle		= Key.of( "oracle" );
-		public static final Key	db2			= Key.of( "db2" );
-	}
-
 	/**
 	 * Constructor
 	 */
@@ -48,7 +40,7 @@ public class EncodeForSQL extends BIF {
 		super();
 		declaredArguments = new Argument[] {
 		    new Argument( true, "string", Key.string ),
-		    new Argument( true, "string", BIFKeys.dialect ),
+		    new Argument( true, "string", KeyDirectory.dialect ),
 		    new Argument( true, "boolean", Key.canonicalize, false )
 		};
 	}
@@ -65,7 +57,7 @@ public class EncodeForSQL extends BIF {
 	 */
 	public String _invoke( IBoxContext context, ArgumentsScope arguments ) {
 		String	str				= arguments.getAsString( Key.string );
-		String	dialect			= arguments.getAsString( BIFKeys.dialect );
+		String	dialect			= arguments.getAsString( KeyDirectory.dialect );
 		boolean	canonicalize	= arguments.getAsBoolean( Key.canonicalize );
 
 		// Get the ESAPI encoder
@@ -90,19 +82,19 @@ public class EncodeForSQL extends BIF {
 
 		Key dialectKey = Key.of( dialect );
 
-		if ( dialectKey.equals( BIFKeys.mysql_ansi ) ) {
+		if ( dialectKey.equals( KeyDirectory.mysql_ansi ) ) {
 			return new MySQLCodec( Mode.ANSI );
 		}
 
-		if ( dialectKey.equals( BIFKeys.mysql ) ) {
+		if ( dialectKey.equals( KeyDirectory.mysql ) ) {
 			return new MySQLCodec( Mode.STANDARD );
 		}
 
-		if ( dialectKey.equals( BIFKeys.oracle ) ) {
+		if ( dialectKey.equals( KeyDirectory.oracle ) ) {
 			return new OracleCodec();
 		}
 
-		if ( dialectKey.equals( BIFKeys.db2 ) ) {
+		if ( dialectKey.equals( KeyDirectory.db2 ) ) {
 			return new DB2Codec();
 		}
 
