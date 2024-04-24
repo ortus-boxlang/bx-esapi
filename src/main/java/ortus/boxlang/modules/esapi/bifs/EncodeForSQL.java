@@ -78,7 +78,7 @@ public class EncodeForSQL extends BIF {
 	 *
 	 * @return The codec for the specified dialect.
 	 */
-	private Codec getCodec( String dialect ) {
+	private Codec<?> getCodec( String dialect ) {
 
 		Key dialectKey = Key.of( dialect );
 
