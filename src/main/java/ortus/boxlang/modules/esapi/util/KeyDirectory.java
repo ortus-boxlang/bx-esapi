@@ -21,6 +21,7 @@ import ortus.boxlang.runtime.scopes.Key;
  */
 public class KeyDirectory {
 
+	public static final Key	base64					= Key.of( "base64" );
 	public static final Key	css						= Key.of( "css" );
 	public static final Key	db2						= Key.of( "db2" );
 	public static final Key	dialect					= Key.of( "dialect" );
@@ -38,6 +39,7 @@ public class KeyDirectory {
 	public static final Key	html					= Key.of( "html" );
 	public static final Key	htmlAttribute			= Key.of( "htmlAttribute" );
 	public static final Key	javascript				= Key.of( "javascript" );
+	public static final Key	json					= Key.of( "json" );
 	public static final Key	ldap					= Key.of( "ldap" );
 	public static final Key	mysql					= Key.of( "mysql" );
 	public static final Key	mysql_ansi				= Key.of( "mysql_ansi" );

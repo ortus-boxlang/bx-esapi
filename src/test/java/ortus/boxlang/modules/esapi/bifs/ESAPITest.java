@@ -143,4 +143,19 @@ public class ESAPITest {
 		instance.executeSource( "result = decodeForHTML( '&lt;test&gt;' )", context );
 		assertEquals( "<test>", variables.get( result ) );
 	}
+
+	@DisplayName( "It can decode for json " )
+	@Test
+	public void testDecodeForJSON() {
+		instance.executeSource( "result = decodeForJSON( '{\"test\":\"value\"}' )", context );
+		assertEquals( "{\"test\":\"value\"}", variables.get( result ) );
+	}
+
+	@DisplayName( "It can decode for Base 64" )
+	@Test
+	public void testDecodeForBase64() {
+		instance.executeSource( "result = decodeForBase64( 'VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGluZw==' )", context );
+		assertEquals( "This is a base64 encoding", variables.get( result ) );
+	}
+
 }
