@@ -31,6 +31,7 @@ import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
 import ortus.boxlang.runtime.validation.Validator;
 
 @BoxBIF
+@BoxBIF( alias = "esapiEncode" )
 public class EncodeFor extends BIF {
 
 	private static final List<String> ENCODING_TYPES = List.of(
