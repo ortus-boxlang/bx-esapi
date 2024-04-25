@@ -44,6 +44,7 @@ public class KeyDirectory {
 	public static final Key	mysql					= Key.of( "mysql" );
 	public static final Key	mysql_ansi				= Key.of( "mysql_ansi" );
 	public static final Key	oracle					= Key.of( "oracle" );
+	public static final Key	policy					= Key.of( "policy" );
 	public static final Key	restrictMultiple		= Key.of( "restrictMultiple" );
 	public static final Key	restrictMixed			= Key.of( "restrictMixed" );
 	public static final Key	url						= Key.of( "url" );
