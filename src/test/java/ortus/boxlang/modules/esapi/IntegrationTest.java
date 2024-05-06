@@ -30,7 +30,7 @@ public class IntegrationTest {
 		// Given
 		Key				moduleName		= new Key( "bx-esapi" );
 		String			physicalPath	= Paths.get( "./build/module" ).toAbsolutePath().toString();
-		ModuleRecord	moduleRecord	= new ModuleRecord( moduleName, physicalPath );
+		ModuleRecord	moduleRecord	= new ModuleRecord( physicalPath );
 		IBoxContext		context			= new ScriptingRequestBoxContext();
 		BoxRuntime		runtime			= BoxRuntime.getInstance( true );
 		ModuleService	moduleService	= runtime.getModuleService();
