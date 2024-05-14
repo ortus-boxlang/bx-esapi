@@ -18,6 +18,7 @@
 		"moduleName": "esapi"
 	},
 	"private": false,
+	"unlisted": true,
 	"license": [
 		{
 			"type": "Apache-2.0",
