@@ -42,7 +42,7 @@ jobs:
       - name: Setup CommandBox
         uses: Ortus-Solutions/setup-commandbox@v2.0.1
         with:
-          forgeboxAPIKey: ${{ secrets.FORGEBOX_TOKEN }}
+          forgeboxAPIKey: ${{ secrets.FORGEBOX_API_TOKEN }}
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -106,7 +106,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: boxlang-build
+          name: downloads.ortussolutions.com
           path: |
             build/distributions/**
             build/libs/**
@@ -122,7 +122,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_SECRET }}
           SOURCE_DIR: "build/distributions"
-          DEST_DIR: "boxlang-modules/${{ env.MODULE_ID }}/${{ env.VERSION }}"
+          DEST_DIR: "ortussolutions/boxlang-modules/${{ env.MODULE_ID }}/${{ env.VERSION }}"
 
       # - name: Upload API Docs to S3
       #   uses: jakejarvis/s3-sync-action@master
@@ -137,6 +137,11 @@ jobs:
 
       # - name: Publish to Maven Central
       #   run: |
+
+      - name: Publish to ForgeBox
+        run: |
+          cd build/module
+          box forgebox publish --force
 
       - name: Create Github Release
         uses: taiki-e/create-gh-release-action@v1.8.0
