@@ -62,11 +62,16 @@ public class EncodeForUnits extends BIF {
 	 */
 	public String _invoke( IBoxContext context, ArgumentsScope arguments ) {
 		Key		bifMethodKey	= arguments.getAsKey( BIF.__functionName );
-		String	str				= arguments.getAsString( Key.string ).trim();
+		String	str				= arguments.getAsString( Key.string );
 		boolean	canonicalize	= arguments.getAsBoolean( Key.canonicalize );
 
+		if ( str == null ) {
+			return null;
+		}
+		str = str.trim();
+
 		// Get the ESAPI encoder
-		Encoder	encoder			= ESAPI.encoder();
+		Encoder encoder = ESAPI.encoder();
 
 		// Canonicalize the input string if requested
 		if ( canonicalize ) {

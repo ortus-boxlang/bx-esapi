@@ -14,6 +14,7 @@
  */
 package ortus.boxlang.modules.esapi.bifs;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -65,6 +66,13 @@ public class ESAPITest {
 	public void testEncodeForHTML() {
 		instance.executeSource( "result = encodeForHTML( '<test>', false )", context );
 		assertEquals( "&lt;test&gt;", variables.get( result ) );
+	}
+
+	@DisplayName( "EncodeForX methods return nulls unmodified" )
+	@Test
+	public void testEncodeForHTMLWithNull() {
+		instance.executeSource( "result = encodeForHTML( null )", context );
+		assertNull( variables.get( result ) );
 	}
 
 	@DisplayName( "It can encode for HTML attribute" )
