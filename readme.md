@@ -1,4 +1,4 @@
-# ⚡︎ BoxLang Module: ESAPI
+# ⚡︎ BoxLang Module: ESAPI & Antisamy Module
 
 ```
 |:------------------------------------------------------:|
