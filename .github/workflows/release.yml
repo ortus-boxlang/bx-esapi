@@ -108,10 +108,8 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: downloads.ortussolutions.com
+          name: boxlang-build
           path: |
-            build/distributions/**
-            build/libs/**
             build/reports/tests/**
             changelog.md
 
