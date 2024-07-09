@@ -27,8 +27,6 @@ This module contributes the following ESAPI encoding BIFs:
 * `encodeFor()` - see [cfdocs.org/encodeFor](https://cfdocs.org/encodeFor)
 * `esapiEncode()` - see [cfdocs.org/esapiEncode](https://cfdocs.org/esapiEncode)
 * `encodeForSQL()` - see [cfdocs.org/encodeForSQL](https://cfdocs.org/encodeForSQL)
-* `encodeForUnits()` - see [cfdocs.org/encodeForUnits](https://cfdocs.org/encodeForUnits)
-
 * `encodeForCSS()` - see [cfdocs.org/encodeForCSS](https://cfdocs.org/encodeForCSS)
 * `encodeForDN()` - see [cfdocs.org/encodeForDN](https://cfdocs.org/encodeForDN)
 * `encodeForHTML()` - see [cfdocs.org/encodeForHTML](https://cfdocs.org/encodeForHTML)
