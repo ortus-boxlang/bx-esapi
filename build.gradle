@@ -45,7 +45,7 @@ dependencies {
     compileOnly files( 'src/test/resources/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
 
 	// https://mvnrepository.com/artifact/org.owasp.esapi/esapi
-	implementation 'org.owasp.esapi:esapi:2.5.4.0'
+	implementation 'org.owasp.esapi:esapi:2.6.0.0'
 	// https://mvnrepository.com/artifact/com.googlecode.owasp-java-html-sanitizer/owasp-java-html-sanitizer
 	implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1'
 
