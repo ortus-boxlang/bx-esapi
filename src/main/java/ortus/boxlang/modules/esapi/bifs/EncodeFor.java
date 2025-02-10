@@ -15,7 +15,6 @@
 package ortus.boxlang.modules.esapi.bifs;
 
 import java.util.List;
-import java.util.Set;
 
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.Encoder;
@@ -45,7 +44,7 @@ public class EncodeFor extends BIF {
 		super();
 		declaredArguments = new Argument[] {
 		    new Argument( true, Argument.STRING, Key.type, Validator.valueOneOf( ENCODING_TYPES.toArray( new String[ 0 ] ) ) ),
-		    new Argument( true, Argument.STRING, Key.value, Set.of( Validator.NON_EMPTY ) )
+		    new Argument( false, Argument.STRING, Key.value, "" )
 		};
 	}
 

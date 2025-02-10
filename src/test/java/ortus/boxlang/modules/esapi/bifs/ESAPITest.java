@@ -14,8 +14,8 @@
  */
 package ortus.boxlang.modules.esapi.bifs;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -136,6 +136,13 @@ public class ESAPITest {
 	public void testEncodeFor() {
 		instance.executeSource( "result = encodeFor( 'html', '<test>' )", context );
 		assertEquals( "&lt;test&gt;", variables.get( result ) );
+	}
+
+	@DisplayName( "It can encodeFor with an empty value" )
+	@Test
+	public void testEncodeForWithEmptyValue() {
+		instance.executeSource( "result = encodeFor( 'html', '' )", context );
+		assertEquals( "", variables.get( result ) );
 	}
 
 	@DisplayName( "It can decodeFromURL" )

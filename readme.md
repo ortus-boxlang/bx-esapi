@@ -16,9 +16,15 @@
 
 <p>&nbsp;</p>
 
-This module provides ESAPI functionality for stronger, more secure applications. This module is part of the [BoxLang](https://boxlang.io/) project.
+This module provides ESAPI functionality for stronger, more secure applications in BoxLang based on the OWASP ESAPI project: https://owasp.org/www-project-enterprise-security-api and OWASP AntiSamy project: https://owasp.org/www-project-antisamy/
+
+It includes encoding, decoding, and sanitization functions to help protect your application from common security vulnerabilities.  It also includes the AntiSamy library for cleaning up HTML content.
+
+Once installed, several built-in-functions and components will be available for use in your BoxLang code.
 
 ## BIFs
+
+Here are the built-in-functions (BIFs) that are available in this module:
 
 ### Encoding
 
