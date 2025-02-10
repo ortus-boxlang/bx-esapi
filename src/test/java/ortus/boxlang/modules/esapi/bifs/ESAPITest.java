@@ -14,8 +14,8 @@
  */
 package ortus.boxlang.modules.esapi.bifs;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -164,6 +164,13 @@ public class ESAPITest {
 	public void testDecodeForBase64() {
 		instance.executeSource( "result = decodeForBase64( 'VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGluZw==' )", context );
 		assertEquals( "This is a base64 encoding", variables.get( result ) );
+	}
+
+	@DisplayName( "It can encode an empty string" )
+	@Test
+	public void testEncodeEmptyString() {
+		instance.executeSource( "result = esapiEncode( 'html', '' )", context );
+		assertEquals( "", variables.get( result ) );
 	}
 
 }
