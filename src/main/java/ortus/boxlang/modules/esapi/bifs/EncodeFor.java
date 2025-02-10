@@ -44,7 +44,7 @@ public class EncodeFor extends BIF {
 		super();
 		declaredArguments = new Argument[] {
 		    new Argument( true, Argument.STRING, Key.type, Validator.valueOneOf( ENCODING_TYPES.toArray( new String[ 0 ] ) ) ),
-		    new Argument( true, Argument.STRING, Key.value )
+		    new Argument( false, Argument.STRING, Key.value )
 		};
 	}
 
