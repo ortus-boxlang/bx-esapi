@@ -57,7 +57,7 @@ public class SanitizeHTML extends BIF {
 		super();
 		declaredArguments = new Argument[] {
 		    new Argument( true, Argument.STRING, Key.string ),
-		    new Argument( false, Argument.STRING, KeyDirectory.policy, "" )
+		    new Argument( false, Argument.ANY, KeyDirectory.policy, "" )
 		};
 	}
 
@@ -91,7 +91,7 @@ public class SanitizeHTML extends BIF {
 	 */
 	public Object _invoke( IBoxContext context, ArgumentsScope arguments ) {
 		String	unsafeString	= arguments.getAsString( Key.string ).trim();
-		Object	policy			= arguments.getAsString( KeyDirectory.policy );
+		Object	policy			= arguments.get( KeyDirectory.policy );
 
 		// If it's a string, then try to match it
 		if ( policy instanceof String castedPolicy ) {
