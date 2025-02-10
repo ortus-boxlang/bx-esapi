@@ -138,6 +138,13 @@ public class ESAPITest {
 		assertEquals( "&lt;test&gt;", variables.get( result ) );
 	}
 
+	@DisplayName( "It can encodeFor with an empty value" )
+	@Test
+	public void testEncodeForWithEmptyValue() {
+		instance.executeSource( "result = encodeFor( 'html', '' )", context );
+		assertEquals( "", variables.get( result ) );
+	}
+
 	@DisplayName( "It can decodeFromURL" )
 	@Test
 	public void testDecodeFromURL() {

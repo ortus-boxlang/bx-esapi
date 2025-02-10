@@ -42,7 +42,7 @@ public class EncodeForSQL extends BIF {
 		declaredArguments = new Argument[] {
 		    new Argument( true, "string", Key.string ),
 		    new Argument( true, "string", KeyDirectory.dialect ),
-		    new Argument( true, "boolean", Key.canonicalize, false )
+		    new Argument( false, "boolean", Key.canonicalize, false )
 		};
 	}
 

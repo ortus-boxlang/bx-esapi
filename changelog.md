@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `sanitizeHTML()` policy argument can be a string or a real policy object
+- JUnit Runtime Runner for tests
+- Preferred way to exclude test resources
+
+### Added
+
+- Build updates
+- Lots of docs updates
+
 ## [1.1.0] - 2024-09-16
 
 ### Added
