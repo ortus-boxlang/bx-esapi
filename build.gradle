@@ -39,9 +39,9 @@ dependencies {
 	// Until BoxLang is published to Maven Central
 	// Look for it in the local build directory
 	// You must run `./gradle build -x test` in the BoxLang project
-	compileOnly files( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '-all.jar' )
+	compileOnly files( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '.jar' )
 	compileOnly files( '../../boxlang-web-support/build/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
-    compileOnly files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '-all.jar' )
+    compileOnly files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '.jar' )
     compileOnly files( 'src/test/resources/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
 
 	// https://mvnrepository.com/artifact/org.owasp.esapi/esapi
@@ -50,14 +50,17 @@ dependencies {
 	implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1'
 
     // Testing Dependencies
-	testImplementation files( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '-all.jar' )
+	testImplementation files( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '.jar' )
 	testImplementation files( '../../boxlang-web-support/build/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
-	testImplementation files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '-all.jar' )
+	testImplementation files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '.jar' )
     testImplementation files( 'src/test/resources/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
 
+	// Testing Frameworks
 	testImplementation "org.junit.jupiter:junit-jupiter:5.+"
 	testImplementation "org.mockito:mockito-core:5.+"
 	testImplementation "com.google.truth:truth:1.+"
+	// Explicitly declare the JUnit platform launcher (to avoid deprecation)
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 java {
@@ -131,6 +134,7 @@ jar {
     }
 }
 shadowJar {
+	archiveClassifier = ""
     mergeServiceFiles()
     destinationDirectory = file( "build/libs" )
 }
@@ -152,12 +156,12 @@ spotless {
 
 /**
  * Custom task that creates a build/module folders
- * - Copies the build/libs/BoxLangModuleTemplate-1.0.0-all.jar to build/module/libs/BoxLangModuleTemplate-1.0.0-all.jar
+ * - Copies the build/libs/BoxLangModuleTemplate-1.0.0.jar to build/module/libs/BoxLangModuleTemplate-1.0.0.jar
  * - Copies the src/main/bx/** to build/module/ folder.
  */
 task createModuleStructure(type: Copy) {
     from( 'build/libs' ) {
-		include "${project.name}-${version}-all.jar"
+		include "${project.name}-${version}.jar"
         into 'libs'
     }
     from( 'src/main/bx' ) {
@@ -165,7 +169,7 @@ task createModuleStructure(type: Copy) {
 		// Token Replacements Go Here
 		filter{ line -> line.replaceAll( '@build.version@', project.version ) }
 		if( project.branch == "development" ){
-			filter{ line -> line.replaceAll( '\\+@build.number@', '-SNAPSHOT' ) }
+			filter{ line -> line.replaceAll( '\\+@build.number@', '' ) }
 		} else {
 			filter{ line -> line.replaceAll( '@build.number@', project.buildID ) }
 		}
@@ -177,7 +181,7 @@ task createModuleStructure(type: Copy) {
 		// Token Replacements Go Here
 		filter{ line -> line.replaceAll( '@build.version@', project.version ) }
 		if( project.branch == "development" ){
-			filter{ line -> line.replaceAll( '\\+@build.number@', '-SNAPSHOT' ) }
+			filter{ line -> line.replaceAll( '\\+@build.number@', '' ) }
 		} else {
 			filter{ line -> line.replaceAll( '@build.number@', project.buildID ) }
 		}
@@ -203,11 +207,21 @@ test {
     testLogging {
 		showStandardStreams = true
 	}
+	//classpath = classpath.filter { !it.path.contains( "build${File.separator}resources" ) }
+}
+sourceSets {
+    test {
+        resources {
+			// Removes all test resources
+			// We do not want any resources interfering in testing modes
+            resources.setSrcDirs( [] )
+        }
+    }
 }
 
 /**
  * TEMPORARY until we publish to maven
- * Task to download the latest jar from https://ortus-temp.s3.amazonaws.com/jericho/libs/boxlang-1.0.0-all.jar
+ * Task to download the latest jar from https://ortus-temp.s3.amazonaws.com/jericho/libs/boxlang-1.0.0.jar
  */
 task downloadBoxLang( type: Download ) {
 	// Create the destination directory
@@ -216,7 +230,7 @@ task downloadBoxLang( type: Download ) {
 	}
 	// Configure the URLs of the files to download
 	src([
-		"https://downloads.ortussolutions.com/ortussolutions/boxlang/${boxlangVersion}/boxlang-${boxlangVersion}-all.jar",
+		"https://downloads.ortussolutions.com/ortussolutions/boxlang/${boxlangVersion}/boxlang-${boxlangVersion}.jar",
 		"https://downloads.ortussolutions.com/ortussolutions/boxlang-runtimes/boxlang-web-support/${boxlangVersion}/boxlang-web-support-${boxlangVersion}.jar"
 	])
 	// Specify the destination directories for the downloaded files
