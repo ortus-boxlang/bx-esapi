@@ -69,16 +69,5 @@ public class IntegrationTest {
 			assertThat( functionService.hasGlobalFunction( Key.of( key ) ) ).isTrue();
 		} );
 
-		// @formatter:off
-		runtime.executeSource(
-		    """
-			// Testing code here
-			""",
-		    context
-		);
-		// @formatter:on
-
-		// Asserts here
-
 	}
 }

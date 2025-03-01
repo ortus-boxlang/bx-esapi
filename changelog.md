@@ -9,10 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-02-22
+
+### Fixed
+
+- `sanitizeHTML()` policy argument can be a string or a real policy object
+- JUnit Runtime Runner for tests
+- Preferred way to exclude test resources
+
+### Added
+
+- Build updates
+- Lots of docs updates
+
 ## [1.1.0] - 2024-09-16
 
 ### Added
 
+- Upgraded to all latest CI
 - Upgraded to all latest CI
 
 ## [1.0.0] - 2024-06-13
@@ -20,7 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded to latest ESAPI due to CVE
 - First iteration of this module
 
-[Unreleased]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.2.0...HEAD
+
+[1.2.0]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.1.0...v1.2.0
 
 [1.1.0]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.0.0...v1.1.0
 
