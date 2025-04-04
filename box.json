@@ -3,13 +3,13 @@
 	"version": "@build.version@+@build.number@",
 	"location": "https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/bx-esapi/@build.version@/bx-esapi-@build.version@.zip",
 	"author": "Ortus Solutions",
-	"homepage": "https://github.com/boxlang-modules/bx-esapi",
-	"documentation": "https://github.com/boxlang-modules/bx-esapi",
+	"homepage": "https://github.com/ortus-boxlang/bx-esapi",
+	"documentation": "https://github.com/ortus-boxlang/bx-esapi",
 	"repository": {
 		"type": "git",
-		"URL": "https://github.com/boxlang-modules/bx-esapi"
+		"URL": "https://github.com/ortus-boxlang/bx-esapi"
 	},
-	"bugs": "https://github.com/boxlang-modules/bx-esapi/issues",
+	"bugs": "https://github.com/ortus-boxlang/bx-esapi/issues",
 	"slug": "bx-esapi",
 	"shortDescription": "Module template for BoxLang modules",
 	"type": "boxlang-modules",

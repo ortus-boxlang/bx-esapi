@@ -21,10 +21,12 @@ import org.owasp.esapi.errors.EncodingException;
 import ortus.boxlang.modules.esapi.util.KeyDirectory;
 import ortus.boxlang.runtime.bifs.BIF;
 import ortus.boxlang.runtime.bifs.BoxBIF;
+import ortus.boxlang.runtime.bifs.BoxMember;
 import ortus.boxlang.runtime.context.IBoxContext;
 import ortus.boxlang.runtime.scopes.ArgumentsScope;
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.types.Argument;
+import ortus.boxlang.runtime.types.BoxLangType;
 import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
 
 @BoxBIF( alias = "encodeForCSS" )
@@ -37,6 +39,16 @@ import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
 @BoxBIF( alias = "encodeForXML" )
 @BoxBIF( alias = "encodeForXMLAttribute" )
 @BoxBIF( alias = "encodeForXPath" )
+@BoxMember( type = BoxLangType.STRING, name = "encodeForHTMLAttribute" )
+@BoxMember( type = BoxLangType.STRING, name = "encodeForCSS" )
+@BoxMember( type = BoxLangType.STRING, name = "encodeForDN" )
+@BoxMember( type = BoxLangType.STRING, name = "encodeForHTML" )
+@BoxMember( type = BoxLangType.STRING, name = "encodeForJavaScript" )
+@BoxMember( type = BoxLangType.STRING, name = "encodeForLDAP" )
+@BoxMember( type = BoxLangType.STRING, name = "encodeForURL" )
+@BoxMember( type = BoxLangType.STRING, name = "encodeForXML" )
+@BoxMember( type = BoxLangType.STRING, name = "encodeForXMLAttribute" )
+@BoxMember( type = BoxLangType.STRING, name = "encodeForXPath" )
 public class EncodeForUnits extends BIF {
 
 	/**

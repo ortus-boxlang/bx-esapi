@@ -3,41 +3,18 @@ package ortus.boxlang.modules.esapi.bifs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import ortus.boxlang.runtime.BoxRuntime;
-import ortus.boxlang.runtime.context.IBoxContext;
-import ortus.boxlang.runtime.context.ScriptingRequestBoxContext;
-import ortus.boxlang.runtime.scopes.IScope;
-import ortus.boxlang.runtime.scopes.Key;
-import ortus.boxlang.runtime.scopes.VariablesScope;
+import ortus.boxlang.modules.esapi.BaseIntegrationTest;
 import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
 
-public class CanonicalizeTest {
-
-	static BoxRuntime	instance;
-	IBoxContext			context;
-	IScope				variables;
-	static Key			result	= new Key( "result" );
-
-	@BeforeAll
-	public static void setUp() {
-		instance = BoxRuntime.getInstance( true );
-	}
-
-	@BeforeEach
-	public void setupEach() {
-		context		= new ScriptingRequestBoxContext( instance.getRuntimeContext() );
-		variables	= context.getScopeNearby( VariablesScope.name );
-	}
+public class CanonicalizeTest extends BaseIntegrationTest {
 
 	@DisplayName( "It can use canonicalize" )
 	@Test
 	public void testCanonicalize() {
-		instance.executeSource(
+		runtime.executeSource(
 		    "result = canonicalize( '&lt;', false, false )",
 		    context
 		);
@@ -48,7 +25,7 @@ public class CanonicalizeTest {
 	@Test
 	public void testCanonicalizeThrowException() {
 		assertThrows( BoxRuntimeException.class, () -> {
-			instance.executeSource(
+			runtime.executeSource(
 			    "result = canonicalize( '%26lt; %26lt; %2526lt%253B %2526lt%253B %2526lt%253B', true, true, true )",
 			    context
 			);
@@ -59,7 +36,7 @@ public class CanonicalizeTest {
 	@Test
 	public void testCanonicalizeEnforceMultipleAndMixedEncodingDetection() {
 
-		instance.executeSource(
+		runtime.executeSource(
 		    "result = canonicalize('%26lt; %26lt; %2526lt%253B %2526lt%253B %2526lt%253B', true, true )",
 		    context
 		);

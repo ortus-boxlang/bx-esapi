@@ -2,40 +2,17 @@ package ortus.boxlang.modules.esapi.bifs;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import ortus.boxlang.runtime.BoxRuntime;
-import ortus.boxlang.runtime.context.IBoxContext;
-import ortus.boxlang.runtime.context.ScriptingRequestBoxContext;
-import ortus.boxlang.runtime.scopes.IScope;
-import ortus.boxlang.runtime.scopes.Key;
-import ortus.boxlang.runtime.scopes.VariablesScope;
+import ortus.boxlang.modules.esapi.BaseIntegrationTest;
 
-public class IsSafeHTMLTest {
-
-	static BoxRuntime	instance;
-	IBoxContext			context;
-	IScope				variables;
-	static Key			result	= new Key( "result" );
-
-	@BeforeAll
-	public static void setUp() {
-		instance = BoxRuntime.getInstance( true );
-	}
-
-	@BeforeEach
-	public void setupEach() {
-		context		= new ScriptingRequestBoxContext( instance.getRuntimeContext() );
-		variables	= context.getScopeNearby( VariablesScope.name );
-	}
+public class IsSafeHTMLTest extends BaseIntegrationTest {
 
 	@DisplayName( "It can use verify if html is safe using the default policy" )
 	@Test
 	public void testIsSafeHTML() {
-		instance.executeSource(
+		runtime.executeSource(
 		    """
 		    	result = IsSafeHTML( "<b>hello</b>" );
 		    """,
@@ -45,7 +22,7 @@ public class IsSafeHTMLTest {
 		assertThat( variables.get( result ) ).isEqualTo( true );
 
 		// Test with an unsafe html
-		instance.executeSource(
+		runtime.executeSource(
 		    """
 		    	result = IsSafeHTML( "<script>alert('hello');</script>" );
 		    """,
@@ -58,7 +35,7 @@ public class IsSafeHTMLTest {
 	@DisplayName( "It can validate with a explicit policy" )
 	@Test
 	public void testIsSafeHTMLWithPolicy() {
-		instance.executeSource(
+		runtime.executeSource(
 		    """
 		    	result = IsSafeHTML( "<b>hello</b>", "myspace" );
 		    """,
@@ -68,7 +45,7 @@ public class IsSafeHTMLTest {
 		assertThat( variables.get( result ) ).isEqualTo( true );
 
 		// Test with an unsafe html
-		instance.executeSource(
+		runtime.executeSource(
 		    """
 		    	result = IsSafeHTML( "<script>alert('hello');</script>", "myspace" );
 		    """,
