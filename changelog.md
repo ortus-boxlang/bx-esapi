@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New Esapi Service to take care of service loading or instantiation capabilities
 - Muted initialization of ESAPI logger
 - Real integration testing
+- Updated to latest ESAPI
 
 ## [1.2.0] - 2025-02-22
 
