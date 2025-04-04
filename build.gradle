@@ -39,21 +39,22 @@ dependencies {
 	// Until BoxLang is published to Maven Central
 	// Look for it in the local build directory
 	// You must run `./gradle build -x test` in the BoxLang project
-	compileOnly files( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '.jar' )
-	compileOnly files( '../../boxlang-web-support/build/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
-    compileOnly files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '.jar' )
-    compileOnly files( 'src/test/resources/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
+	if ( file( '../boxlang/build/libs/boxlang-' + boxlangVersion + '.jar' ).exists() ) {
+		compileOnly files( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '.jar' )
+		compileOnly files( '../../boxlang-web-support/build/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
+		testImplementation files( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '.jar' )
+		testImplementation files( '../../boxlang-web-support/build/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
+	} else {
+		compileOnly files( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '.jar' )
+		compileOnly files( '../../boxlang-web-support/build/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
+		testImplementation files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '.jar' )
+    	testImplementation files( 'src/test/resources/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
+	}
 
 	// https://mvnrepository.com/artifact/org.owasp.esapi/esapi
 	implementation 'org.owasp.esapi:esapi:2.5.4.0'
 	// https://mvnrepository.com/artifact/com.googlecode.owasp-java-html-sanitizer/owasp-java-html-sanitizer
 	implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1'
-
-    // Testing Dependencies
-	testImplementation files( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '.jar' )
-	testImplementation files( '../../boxlang-web-support/build/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
-	testImplementation files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '.jar' )
-    testImplementation files( 'src/test/resources/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
 
 	// Testing Frameworks
 	testImplementation "org.junit.jupiter:junit-jupiter:5.+"
