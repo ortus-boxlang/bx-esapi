@@ -43,8 +43,8 @@ dependencies {
 		testImplementation files( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '.jar' )
 		testImplementation files( '../../boxlang-web-support/build/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
 	} else {
-		compileOnly files( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '.jar' )
-		compileOnly files( '../../boxlang-web-support/build/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
+		compileOnly files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '.jar' )
+		compileOnly files( 'src/test/resources/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
 		testImplementation files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '.jar' )
     	testImplementation files( 'src/test/resources/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
 	}
