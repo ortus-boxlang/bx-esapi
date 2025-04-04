@@ -17,166 +17,146 @@ package ortus.boxlang.modules.esapi.bifs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import ortus.boxlang.runtime.BoxRuntime;
-import ortus.boxlang.runtime.context.IBoxContext;
-import ortus.boxlang.runtime.context.ScriptingRequestBoxContext;
-import ortus.boxlang.runtime.scopes.IScope;
-import ortus.boxlang.runtime.scopes.Key;
-import ortus.boxlang.runtime.scopes.VariablesScope;
+import ortus.boxlang.modules.esapi.BaseIntegrationTest;
 
-public class ESAPITest {
-
-	static BoxRuntime	instance;
-	IBoxContext			context;
-	IScope				variables;
-	static Key			result	= new Key( "result" );
-
-	@BeforeAll
-	public static void setUp() {
-		instance = BoxRuntime.getInstance( true );
-	}
-
-	@BeforeEach
-	public void setupEach() {
-		context		= new ScriptingRequestBoxContext( instance.getRuntimeContext() );
-		variables	= context.getScopeNearby( VariablesScope.name );
-	}
+public class ESAPITest extends BaseIntegrationTest {
 
 	@DisplayName( "It can encode for CSS" )
 	@Test
 	public void testEncodeForCSS() {
-		instance.executeSource( "result = encodeForCSS( '<test>', false )", context );
+		runtime.executeSource( "result = encodeForCSS( '<test>', false )", context );
 		assertEquals( "\\3c test\\3e ", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encode for DN" )
 	@Test
 	public void testEncodeForDN() {
-		instance.executeSource( "result = encodeForDN( 'x,y', false )", context );
+		runtime.executeSource( "result = encodeForDN( 'x,y', false )", context );
 		assertEquals( "x\\,y", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encode for HTML" )
 	@Test
 	public void testEncodeForHTML() {
-		instance.executeSource( "result = encodeForHTML( '<test>', false )", context );
+		runtime.executeSource( "result = encodeForHTML( '<test>', false )", context );
 		assertEquals( "&lt;test&gt;", variables.get( result ) );
 	}
 
 	@DisplayName( "EncodeForX methods return nulls unmodified" )
 	@Test
 	public void testEncodeForHTMLWithNull() {
-		instance.executeSource( "result = encodeForHTML( null )", context );
+		runtime.executeSource( "result = encodeForHTML( null )", context );
 		assertNull( variables.get( result ) );
 	}
 
 	@DisplayName( "It can encode for HTML attribute" )
 	@Test
 	public void testEncodeForHTMLAttribute() {
-		instance.executeSource( "result = encodeForHTMLAttribute( '<test>', false )", context );
+		runtime.executeSource( "result = encodeForHTMLAttribute( '<test>', false )", context );
+		assertEquals( "&lt;test&gt;", variables.get( result ) );
+
+		runtime.executeSource( "result = '<test>'.encodeForHTMLAttribute()", context );
 		assertEquals( "&lt;test&gt;", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encode for JavaScript" )
 	@Test
 	public void testEncodeForJavaScript() {
-		instance.executeSource( "result = encodeForJavaScript( 'foo()', false )", context );
+		runtime.executeSource( "result = encodeForJavaScript( 'foo()', false )", context );
 		assertEquals( "foo\\x28\\x29", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encode for LDAP" )
 	@Test
 	public void testEncodeForLDAP() {
-		instance.executeSource( "result = encodeForLDAP('grant) (| (password = * ) )')", context );
+		runtime.executeSource( "result = encodeForLDAP('grant) (| (password = * ) )')", context );
 		assertEquals( "grant\\29 \\28| \\28password = \\2a \\29 \\29", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encode for URL" )
 	@Test
 	public void testEncodeForURL() {
-		instance.executeSource( "result = encodeForURL( 'http://www.example.com/?foo=bar', false )", context );
+		runtime.executeSource( "result = encodeForURL( 'http://www.example.com/?foo=bar', false )", context );
 		assertEquals( "http%3A%2F%2Fwww.example.com%2F%3Ffoo%3Dbar", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encode for XML" )
 	@Test
 	public void testEncodeForXML() {
-		instance.executeSource( "result = encodeForXML( '<test>', false )", context );
+		runtime.executeSource( "result = encodeForXML( '<test>', false )", context );
 		assertEquals( "&#x3c;test&#x3e;", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encode for XML attribute" )
 	@Test
 	public void testEncodeForXMLAttribute() {
-		instance.executeSource( "result = encodeForXMLAttribute(\"It's for use in attribute values\")", context );
+		runtime.executeSource( "result = encodeForXMLAttribute(\"It's for use in attribute values\")", context );
 		assertEquals( "It&#x27;s for use in attribute values", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encode for XPath" )
 	@Test
 	public void testEncodeForXPath() {
-		instance.executeSource( "result = encodeForXPath( \"' or 1=1\" )", context );
+		runtime.executeSource( "result = encodeForXPath( \"' or 1=1\" )", context );
 		assertEquals( "&#x27; or 1&#x3d;1", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encode for SQL" )
 	@Test
 	public void testEncodeForSQL() {
-		instance.executeSource( "result = encodeForSQL( \"' or '1'='1\", 'mysql', false )", context );
+		runtime.executeSource( "result = encodeForSQL( \"' or '1'='1\", 'mysql', false )", context );
 		assertEquals( "\\' or \\'1\\'\\=\\'1", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encodeFor" )
 	@Test
 	public void testEncodeFor() {
-		instance.executeSource( "result = encodeFor( 'html', '<test>' )", context );
+		runtime.executeSource( "result = encodeFor( 'html', '<test>' )", context );
 		assertEquals( "&lt;test&gt;", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encodeFor with an empty value" )
 	@Test
 	public void testEncodeForWithEmptyValue() {
-		instance.executeSource( "result = encodeFor( 'html', '' )", context );
+		runtime.executeSource( "result = encodeFor( 'html', '' )", context );
 		assertEquals( "", variables.get( result ) );
 	}
 
 	@DisplayName( "It can decodeFromURL" )
 	@Test
 	public void testDecodeFromURL() {
-		instance.executeSource( "result = decodeFromURL( 'http%3A%2F%2Fwww.example.com%2F%3Ffoo%3Dbar' )", context );
+		runtime.executeSource( "result = decodeFromURL( 'http%3A%2F%2Fwww.example.com%2F%3Ffoo%3Dbar' )", context );
 		assertEquals( "http://www.example.com/?foo=bar", variables.get( result ) );
 	}
 
 	@DisplayName( "It can decodeForHTML" )
 	@Test
 	public void testDecodeForHTML() {
-		instance.executeSource( "result = decodeForHTML( '&lt;test&gt;' )", context );
+		runtime.executeSource( "result = decodeForHTML( '&lt;test&gt;' )", context );
 		assertEquals( "<test>", variables.get( result ) );
 	}
 
 	@DisplayName( "It can decode for json " )
 	@Test
 	public void testDecodeForJSON() {
-		instance.executeSource( "result = decodeForJSON( '{\"test\":\"value\"}' )", context );
+		runtime.executeSource( "result = decodeForJSON( '{\"test\":\"value\"}' )", context );
 		assertEquals( "{\"test\":\"value\"}", variables.get( result ) );
 	}
 
 	@DisplayName( "It can decode for Base 64" )
 	@Test
 	public void testDecodeForBase64() {
-		instance.executeSource( "result = decodeForBase64( 'VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGluZw==' )", context );
+		runtime.executeSource( "result = decodeForBase64( 'VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGluZw==' )", context );
 		assertEquals( "This is a base64 encoding", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encode an empty string" )
 	@Test
 	public void testEncodeEmptyString() {
-		instance.executeSource( "result = esapiEncode( 'html', '' )", context );
+		runtime.executeSource( "result = esapiEncode( 'html', '' )", context );
 		assertEquals( "", variables.get( result ) );
 	}
 

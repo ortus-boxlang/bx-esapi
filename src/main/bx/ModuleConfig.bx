@@ -68,6 +68,7 @@ class {
 	 * Called by the ModuleService on module registration
 	 */
 	function configure(){
+
 		/**
 		 * Every module has a settings configuration object
 		 */
