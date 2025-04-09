@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2025-04-09
+
 ### Fixed
 
 - Added missing `Logger.LogPrefix=false` to `bx-esapi.properties` file
@@ -48,7 +50,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded to latest ESAPI due to CVE
 - First iteration of this module
 
-[Unreleased]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.3.1...HEAD
+
+[1.3.1]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.3.0...v1.3.1
 
 [1.3.0]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.2.0...v1.3.0
 
