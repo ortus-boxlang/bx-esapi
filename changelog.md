@@ -9,10 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2025-05-26
+
 ### Added
 
 - Bump org.owasp.esapi:esapi from 2.6.0.0 to 2.6.1.0
-  - https://github.com/ESAPI/esapi-java-legacy/blob/develop/documentation/esapi4java-core-2.6.1.0-release-notes.txt
+  - <https://github.com/ESAPI/esapi-java-legacy/blob/develop/documentation/esapi4java-core-2.6.1.0-release-notes.txt>
 
 ### Fixed
 
@@ -59,7 +61,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded to latest ESAPI due to CVE
 - First iteration of this module
 
-[Unreleased]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.4.0...HEAD
+
+[1.4.0]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.3.1...v1.4.0
 
 [1.3.1]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.3.0...v1.3.1
 
