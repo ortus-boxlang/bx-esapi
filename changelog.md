@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Bump org.owasp.esapi:esapi from 2.6.0.0 to 2.6.1.0
+  - https://github.com/ESAPI/esapi-java-legacy/blob/develop/documentation/esapi4java-core-2.6.1.0-release-notes.txt
+
+### Fixed
+
+- Fixed bump versions in the `gradle.build` file
+
 ## [1.3.1] - 2025-04-09
 
 ### Fixed
