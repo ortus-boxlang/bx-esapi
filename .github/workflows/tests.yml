@@ -39,11 +39,6 @@ jobs:
           distribution: "temurin"
           java-version: ${{ matrix.jdkVersion }}
 
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
-        with:
-          gradle-version: "8.7"
-
       # - name: Setup Database and Fixtures
       #   run: |
       #     sudo systemctl start mysql.service
