@@ -47,14 +47,35 @@ public class EncodeForSQL extends BIF {
 	}
 
 	/**
-	 * Encodes the input string for safe output in the body of a HTML tag.
+	 * Encodes a string for safe inclusion in SQL statements to help prevent SQL injection attacks.
 	 *
-	 * @param context   The context in which the BIF is being invoked.
-	 * @param arguments Argument scope for the BIF.
+	 * <p>
+	 * This function uses the OWASP ESAPI encoder to escape potentially dangerous characters
+	 * based on the specified SQL dialect. Optionally, the input string can be canonicalized before encoding,
+	 * which helps normalize any obfuscated attacks (e.g., double encoding).
+	 * </p>
 	 *
-	 * @argument.string The string to encode.
+	 * <p>
+	 * <strong>Note:</strong> Use this only when absolutely necessary and you fully understand the implications.
+	 * OWASP ESAPI has deprecated this method by default due to common misuse. Prefer using prepared statements
+	 * or parameterized queries to avoid SQL injection altogether. If you still wish to use this method,
+	 * make sure to explicitly allow it in your ESAPI.properties via
+	 * <code>ESAPI.dangerouslyAllowUnsafeMethods.methodNames</code>.
+	 * </p>
 	 *
-	 * @argument.canonicalize Whether to canonicalize the string before encoding.
+	 * @param context   The current BoxLang context in which this BIF is being invoked.
+	 * @param arguments The argument scope passed to the BIF.
+	 *
+	 * @return The SQL-encoded version of the input string.
+	 *
+	 * @argument.string The input string to encode.
+	 * 
+	 * @argument.dialect The SQL dialect (e.g., "mysql", "oracle", "mssql") to determine which codec to use.
+	 * 
+	 * @argument.canonicalize Whether to canonicalize the input before encoding (true/false).
+	 *
+	 * @throws org.owasp.esapi.errors.NotConfiguredByDefaultException
+	 *                                                                if encodeForSQL is not explicitly enabled in the ESAPI configuration.
 	 */
 	public String _invoke( IBoxContext context, ArgumentsScope arguments ) {
 		String	str				= arguments.getAsString( Key.string );
