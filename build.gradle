@@ -44,7 +44,7 @@ dependencies {
 		compileOnly 'io.boxlang:boxlang-web-support:1.3.0'
 		testImplementation 'io.boxlang:boxlang:1.3.0'
 		testImplementation 'io.boxlang:boxlang-web-support:1.3.0'
-	// }
+	}
 
 	// https://mvnrepository.com/artifact/org.owasp.esapi/esapi
 	implementation 'org.owasp.esapi:esapi:2.7.0.0'
