@@ -36,6 +36,7 @@ import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
 @BoxBIF( alias = "encodeForJavaScript" )
 @BoxBIF( alias = "encodeForLDAP" )
 @BoxBIF( alias = "encodeForURL" )
+@BoxBIF( alias = "urlEncode" ) // Alias for compatibility with Lucee
 @BoxBIF( alias = "encodeForXML" )
 @BoxBIF( alias = "encodeForXMLAttribute" )
 @BoxBIF( alias = "encodeForXPath" )
@@ -88,6 +89,10 @@ public class EncodeForUnits extends BIF {
 		// Canonicalize the input string if requested
 		if ( canonicalize ) {
 			str = encoder.canonicalize( str );
+		}
+
+		if ( bifMethodKey.equals( KeyDirectory.urlEncode ) ) {
+			bifMethodKey = KeyDirectory.encodeForURL;
 		}
 
 		try {

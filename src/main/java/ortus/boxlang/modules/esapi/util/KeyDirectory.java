@@ -49,6 +49,7 @@ public class KeyDirectory {
 	public static final Key	restrictMultiple		= Key.of( "restrictMultiple" );
 	public static final Key	restrictMixed			= Key.of( "restrictMixed" );
 	public static final Key	url						= Key.of( "url" );
+	public static final Key	urlEncode				= Key.of( "urlEncode" );
 	public static final Key	xml						= Key.of( "xml" );
 	public static final Key	xmlAttribute			= Key.of( "xmlAttribute" );
 	public static final Key	xPath					= Key.of( "xPath" );
