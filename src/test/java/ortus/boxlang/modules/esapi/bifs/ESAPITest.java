@@ -83,6 +83,13 @@ public class ESAPITest extends BaseIntegrationTest {
 		assertEquals( "http%3A%2F%2Fwww.example.com%2F%3Ffoo%3Dbar", variables.get( result ) );
 	}
 
+	@DisplayName( "It can encode for URL using the Lucee alias" )
+	@Test
+	public void testURLEncode() {
+		runtime.executeSource( "result = URLEncode( 'http://www.example.com/?foo=bar', false )", context );
+		assertEquals( "http%3A%2F%2Fwww.example.com%2F%3Ffoo%3Dbar", variables.get( result ) );
+	}
+
 	@DisplayName( "It can encode for XML" )
 	@Test
 	public void testEncodeForXML() {
