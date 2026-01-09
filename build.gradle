@@ -40,10 +40,10 @@ dependencies {
 		testImplementation files( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '.jar' )
 		testImplementation files( '../../boxlang-web-support/build/libs/boxlang-web-support-' + boxlangVersion + '.jar' )
 	} else {
-		compileOnly 'io.boxlang:boxlang:1.6.0'
-		compileOnly 'io.boxlang:boxlang-web-support:1.6.0'
-		testImplementation 'io.boxlang:boxlang:1.6.0'
-		testImplementation 'io.boxlang:boxlang-web-support:1.6.0'
+		compileOnly 'io.boxlang:boxlang:1.9.0'
+		compileOnly 'io.boxlang:boxlang-web-support:1.9.0'
+		testImplementation 'io.boxlang:boxlang:1.9.0'
+		testImplementation 'io.boxlang:boxlang-web-support:1.9.0'
 	}
 
 	// https://mvnrepository.com/artifact/org.owasp.esapi/esapi
