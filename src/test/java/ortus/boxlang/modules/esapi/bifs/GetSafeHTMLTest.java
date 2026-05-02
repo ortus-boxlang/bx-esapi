@@ -56,7 +56,7 @@ public class GetSafeHTMLTest extends BaseIntegrationTest {
 		    context
 		);
 
-		assertThat( variables.getAsString( result ) ).contains( "a".repeat( 100 ) );
+		assertThat( variables.getAsString( result ) ).isEqualTo( largeInput );
 	}
 
 }
