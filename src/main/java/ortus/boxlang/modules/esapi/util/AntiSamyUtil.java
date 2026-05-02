@@ -15,9 +15,16 @@
 package ortus.boxlang.modules.esapi.util;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
+import org.owasp.validator.html.model.Property;
+import org.owasp.validator.html.model.Tag;
 
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.types.IStruct;
@@ -76,6 +83,40 @@ public class AntiSamyUtil {
 			return Policy.getInstance( policy );
 		} catch ( Exception e ) {
 			throw new BoxRuntimeException( "Error loading policy [" + policy + "]", e );
+		}
+	}
+
+	/**
+	 * Returns a copy of the given policy with a custom maxInputSize directive.
+	 *
+	 * @param base         The base policy to copy
+	 * @param maxInputSize The maximum input size in characters
+	 *
+	 * @return A new policy with the overridden maxInputSize
+	 */
+	@SuppressWarnings( "unchecked" )
+	public static Policy withMaxInputSize( Policy base, int maxInputSize ) {
+		try {
+			Field directivesField = Policy.class.getDeclaredField( "directives" );
+			directivesField.setAccessible( true );
+			Map<String, String> directives = new HashMap<>( ( Map<String, String> ) directivesField.get( base ) );
+			directives.put( Policy.MAX_INPUT_SIZE, String.valueOf( maxInputSize ) );
+
+			Field tagRulesField = Policy.class.getDeclaredField( "tagRules" );
+			tagRulesField.setAccessible( true );
+
+			Field cssRulesField = Policy.class.getDeclaredField( "cssRules" );
+			cssRulesField.setAccessible( true );
+
+			Constructor<InternalPolicy> ctor = InternalPolicy.class.getDeclaredConstructor(
+			    Policy.class, Map.class, Map.class, Map.class );
+			ctor.setAccessible( true );
+			return ctor.newInstance( base,
+			    directives,
+			    ( Map<String, Tag> ) tagRulesField.get( base ),
+			    ( Map<String, Property> ) cssRulesField.get( base ) );
+		} catch ( Exception e ) {
+			throw new BoxRuntimeException( "Error overriding maxInputSize on policy", e );
 		}
 	}
 

@@ -16,6 +16,7 @@ package ortus.boxlang.modules.esapi.bifs;
 
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.CleanResults;
+import org.owasp.validator.html.Policy;
 
 import ortus.boxlang.modules.esapi.util.AntiSamyUtil;
 import ortus.boxlang.modules.esapi.util.KeyDirectory;
@@ -40,7 +41,8 @@ public class GetSafeHTML extends BIF {
 		super();
 		declaredArguments = new Argument[] {
 		    new Argument( true, Argument.STRING, Key.string ),
-		    new Argument( false, Argument.STRING, KeyDirectory.policy, "" )
+		    new Argument( false, Argument.STRING, KeyDirectory.policy, "" ),
+		    new Argument( false, Argument.INTEGER, KeyDirectory.maxInputSize, 0 )
 		};
 	}
 
@@ -66,6 +68,8 @@ public class GetSafeHTML extends BIF {
 	 *
 	 * @arguments.policy The policy to use for sanitization
 	 *
+	 * @arguments.maxInputSize Maximum number of characters to accept (0 = use policy default of 20,000)
+	 *
 	 * @return The sanitized HTML
 	 */
 	public Object _invoke( IBoxContext context, ArgumentsScope arguments ) {
@@ -84,7 +88,12 @@ public class GetSafeHTML extends BIF {
 
 		try {
 			// Scan the input and get clean results
-			CleanResults results = new AntiSamy().scan( input, AntiSamyUtil.loadPolicy( policy ) );
+			Policy	loadedPolicy	= AntiSamyUtil.loadPolicy( policy );
+			int		maxInput		= arguments.getAsInteger( KeyDirectory.maxInputSize );
+			if ( maxInput > 0 ) {
+				loadedPolicy = AntiSamyUtil.withMaxInputSize( loadedPolicy, maxInput );
+			}
+			CleanResults results = new AntiSamy().scan( input, loadedPolicy );
 			return results.getCleanHTML();
 		} catch ( Exception e ) {
 			// Handle exceptions (e.g., policy file not found, AntiSamy initialization error)

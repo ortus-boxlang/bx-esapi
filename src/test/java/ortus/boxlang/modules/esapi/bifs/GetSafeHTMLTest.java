@@ -1,11 +1,14 @@
 package ortus.boxlang.modules.esapi.bifs;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import ortus.boxlang.modules.esapi.BaseIntegrationTest;
+import ortus.boxlang.runtime.scopes.Key;
+import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
 
 public class GetSafeHTMLTest extends BaseIntegrationTest {
 
@@ -30,6 +33,30 @@ public class GetSafeHTMLTest extends BaseIntegrationTest {
 		);
 
 		assertThat( variables.get( result ) ).isEqualTo( "" );
+	}
+
+	@DisplayName( "It respects a custom maxInputSize that exceeds the default 20k limit" )
+	@Test
+	public void testGetSafeHTMLWithMaxInputSize() {
+		// Build a safe HTML string just over the 20,000-character default
+		String largeInput = "<b>" + "a".repeat( 20_001 ) + "</b>";
+
+		// Without maxInputSize override it should throw
+		variables.put( Key.of( "input" ), largeInput );
+		assertThrows( BoxRuntimeException.class, () -> runtime.executeSource(
+		    "result = getSafeHTML( input );",
+		    context
+		) );
+
+		// With a large enough maxInputSize it should succeed
+		runtime.executeSource(
+		    """
+		    	result = getSafeHTML( input, "ebay", 100000 );
+		    """,
+		    context
+		);
+
+		assertThat( variables.getAsString( result ) ).contains( "a".repeat( 100 ) );
 	}
 
 }
