@@ -87,20 +87,22 @@ public class AntiSamyUtil {
 	}
 
 	/**
-	 * Returns a copy of the given policy with a custom maxInputSize directive.
+	 * Returns a copy of the given policy with directive overrides applied from a struct.
+	 * Keys must be the camelCase directive names used by AntiSamy (e.g. {@code maxInputSize},
+	 * {@code nofollowAnchors}, {@code preserveComments}).
 	 *
-	 * @param base         The base policy to copy
-	 * @param maxInputSize The maximum input size in characters
+	 * @param base      The base policy to copy
+	 * @param overrides A struct of directive key/value pairs to override
 	 *
-	 * @return A new policy with the overridden maxInputSize
+	 * @return A new policy with the overrides applied
 	 */
 	@SuppressWarnings( "unchecked" )
-	public static Policy withMaxInputSize( Policy base, int maxInputSize ) {
+	public static Policy withDirectives( Policy base, IStruct overrides ) {
 		try {
 			Field directivesField = Policy.class.getDeclaredField( "directives" );
 			directivesField.setAccessible( true );
 			Map<String, String> directives = new HashMap<>( ( Map<String, String> ) directivesField.get( base ) );
-			directives.put( Policy.MAX_INPUT_SIZE, String.valueOf( maxInputSize ) );
+			overrides.entrySet().forEach( entry -> directives.put( entry.getKey().getName(), entry.getValue().toString() ) );
 
 			Field tagRulesField = Policy.class.getDeclaredField( "tagRules" );
 			tagRulesField.setAccessible( true );
@@ -116,7 +118,7 @@ public class AntiSamyUtil {
 			    ( Map<String, Tag> ) tagRulesField.get( base ),
 			    ( Map<String, Property> ) cssRulesField.get( base ) );
 		} catch ( Exception e ) {
-			throw new BoxRuntimeException( "Error overriding maxInputSize on policy", e );
+			throw new BoxRuntimeException( "Error applying policy directive overrides", e );
 		}
 	}
 

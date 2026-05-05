@@ -28,6 +28,8 @@ import ortus.boxlang.runtime.scopes.ArgumentsScope;
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.types.Argument;
 import ortus.boxlang.runtime.types.BoxLangType;
+import ortus.boxlang.runtime.types.IStruct;
+import ortus.boxlang.runtime.types.Struct;
 import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
 
 @BoxBIF
@@ -42,7 +44,7 @@ public class GetSafeHTML extends BIF {
 		declaredArguments = new Argument[] {
 		    new Argument( true, Argument.STRING, Key.string ),
 		    new Argument( false, Argument.STRING, KeyDirectory.policy, "" ),
-		    new Argument( false, Argument.INTEGER, KeyDirectory.maxInputSize, 0 )
+		    new Argument( false, Argument.STRUCT, KeyDirectory.directives, new Struct() )
 		};
 	}
 
@@ -68,7 +70,7 @@ public class GetSafeHTML extends BIF {
 	 *
 	 * @arguments.policy The policy to use for sanitization
 	 *
-	 * @arguments.maxInputSize Maximum number of characters to accept (0 = use policy default of 20,000)
+	 * @arguments.directives Optional struct of AntiSamy directive overrides (e.g. { maxInputSize: 100000, nofollowAnchors: true })
 	 *
 	 * @return The sanitized HTML
 	 */
@@ -88,10 +90,10 @@ public class GetSafeHTML extends BIF {
 
 		try {
 			// Scan the input and get clean results
-			Policy	loadedPolicy	= AntiSamyUtil.loadPolicy( policy );
-			int		maxInput		= arguments.getAsInteger( KeyDirectory.maxInputSize );
-			if ( maxInput > 0 ) {
-				loadedPolicy = AntiSamyUtil.withMaxInputSize( loadedPolicy, maxInput );
+			Policy	loadedPolicy		= AntiSamyUtil.loadPolicy( policy );
+			IStruct	directiveOverrides	= ( IStruct ) arguments.get( KeyDirectory.directives );
+			if ( !directiveOverrides.isEmpty() ) {
+				loadedPolicy = AntiSamyUtil.withDirectives( loadedPolicy, directiveOverrides );
 			}
 			CleanResults results = new AntiSamy().scan( input, loadedPolicy );
 			return results.getCleanHTML();

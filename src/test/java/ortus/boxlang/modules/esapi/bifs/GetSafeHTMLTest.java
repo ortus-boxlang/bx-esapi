@@ -35,23 +35,23 @@ public class GetSafeHTMLTest extends BaseIntegrationTest {
 		assertThat( variables.get( result ) ).isEqualTo( "" );
 	}
 
-	@DisplayName( "It respects a custom maxInputSize that exceeds the default 20k limit" )
+	@DisplayName( "It respects directive overrides passed as a struct" )
 	@Test
-	public void testGetSafeHTMLWithMaxInputSize() {
+	public void testGetSafeHTMLWithDirectives() {
 		// Build a safe HTML string just over the 20,000-character default
 		String largeInput = "<b>" + "a".repeat( 20_001 ) + "</b>";
 
-		// Without maxInputSize override it should throw
+		// Without directives override it should throw due to the default 20k limit
 		variables.put( Key.of( "input" ), largeInput );
 		assertThrows( BoxRuntimeException.class, () -> runtime.executeSource(
 		    "result = getSafeHTML( input );",
 		    context
 		) );
 
-		// With a large enough maxInputSize it should succeed
+		// With maxInputSize raised via a directives struct it should succeed
 		runtime.executeSource(
 		    """
-		    	result = getSafeHTML( input, "ebay", 100000 );
+		    	result = getSafeHTML( input, "ebay", { maxInputSize: 100000 } );
 		    """,
 		    context
 		);

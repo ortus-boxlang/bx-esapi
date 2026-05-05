@@ -40,8 +40,8 @@ public class KeyDirectory {
 	public static final Key	htmlAttribute			= Key.of( "htmlAttribute" );
 	public static final Key	javascript				= Key.of( "javascript" );
 	public static final Key	json					= Key.of( "json" );
+	public static final Key	directives				= Key.of( "directives" );
 	public static final Key	ldap					= Key.of( "ldap" );
-	public static final Key	maxInputSize			= Key.of( "maxInputSize" );
 	public static final Key	moduleName				= Key.of( "moduleName" );
 	public static final Key	mysql					= Key.of( "mysql" );
 	public static final Key	mysql_ansi				= Key.of( "mysql_ansi" );
