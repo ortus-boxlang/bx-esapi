@@ -15,9 +15,16 @@
 package ortus.boxlang.modules.esapi.util;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
+import org.owasp.validator.html.model.Property;
+import org.owasp.validator.html.model.Tag;
 
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.types.IStruct;
@@ -76,6 +83,42 @@ public class AntiSamyUtil {
 			return Policy.getInstance( policy );
 		} catch ( Exception e ) {
 			throw new BoxRuntimeException( "Error loading policy [" + policy + "]", e );
+		}
+	}
+
+	/**
+	 * Returns a copy of the given policy with directive overrides applied from a struct.
+	 * Keys must be the camelCase directive names used by AntiSamy (e.g. {@code maxInputSize},
+	 * {@code nofollowAnchors}, {@code preserveComments}).
+	 *
+	 * @param base      The base policy to copy
+	 * @param overrides A struct of directive key/value pairs to override
+	 *
+	 * @return A new policy with the overrides applied
+	 */
+	@SuppressWarnings( "unchecked" )
+	public static Policy withDirectives( Policy base, IStruct overrides ) {
+		try {
+			Field directivesField = Policy.class.getDeclaredField( "directives" );
+			directivesField.setAccessible( true );
+			Map<String, String> directives = new HashMap<>( ( Map<String, String> ) directivesField.get( base ) );
+			overrides.entrySet().forEach( entry -> directives.put( entry.getKey().getName(), entry.getValue().toString() ) );
+
+			Field tagRulesField = Policy.class.getDeclaredField( "tagRules" );
+			tagRulesField.setAccessible( true );
+
+			Field cssRulesField = Policy.class.getDeclaredField( "cssRules" );
+			cssRulesField.setAccessible( true );
+
+			Constructor<InternalPolicy> ctor = InternalPolicy.class.getDeclaredConstructor(
+			    Policy.class, Map.class, Map.class, Map.class );
+			ctor.setAccessible( true );
+			return ctor.newInstance( base,
+			    directives,
+			    ( Map<String, Tag> ) tagRulesField.get( base ),
+			    ( Map<String, Property> ) cssRulesField.get( base ) );
+		} catch ( Exception e ) {
+			throw new BoxRuntimeException( "Error applying policy directive overrides", e );
 		}
 	}
 

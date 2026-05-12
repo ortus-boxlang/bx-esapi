@@ -16,6 +16,7 @@ package ortus.boxlang.modules.esapi.bifs;
 
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.CleanResults;
+import org.owasp.validator.html.Policy;
 
 import ortus.boxlang.modules.esapi.util.AntiSamyUtil;
 import ortus.boxlang.modules.esapi.util.KeyDirectory;
@@ -27,6 +28,8 @@ import ortus.boxlang.runtime.scopes.ArgumentsScope;
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.types.Argument;
 import ortus.boxlang.runtime.types.BoxLangType;
+import ortus.boxlang.runtime.types.IStruct;
+import ortus.boxlang.runtime.types.Struct;
 import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
 
 @BoxBIF
@@ -40,7 +43,8 @@ public class GetSafeHTML extends BIF {
 		super();
 		declaredArguments = new Argument[] {
 		    new Argument( true, Argument.STRING, Key.string ),
-		    new Argument( false, Argument.STRING, KeyDirectory.policy, "" )
+		    new Argument( false, Argument.STRING, KeyDirectory.policy, "" ),
+		    new Argument( false, Argument.STRUCT, KeyDirectory.directives, new Struct() )
 		};
 	}
 
@@ -66,6 +70,8 @@ public class GetSafeHTML extends BIF {
 	 *
 	 * @arguments.policy The policy to use for sanitization
 	 *
+	 * @arguments.directives Optional struct of AntiSamy directive overrides (e.g. { maxInputSize: 100000, nofollowAnchors: true })
+	 *
 	 * @return The sanitized HTML
 	 */
 	public Object _invoke( IBoxContext context, ArgumentsScope arguments ) {
@@ -84,7 +90,12 @@ public class GetSafeHTML extends BIF {
 
 		try {
 			// Scan the input and get clean results
-			CleanResults results = new AntiSamy().scan( input, AntiSamyUtil.loadPolicy( policy ) );
+			Policy	loadedPolicy		= AntiSamyUtil.loadPolicy( policy );
+			IStruct	directiveOverrides	= ( IStruct ) arguments.get( KeyDirectory.directives );
+			if ( !directiveOverrides.isEmpty() ) {
+				loadedPolicy = AntiSamyUtil.withDirectives( loadedPolicy, directiveOverrides );
+			}
+			CleanResults results = new AntiSamy().scan( input, loadedPolicy );
 			return results.getCleanHTML();
 		} catch ( Exception e ) {
 			// Handle exceptions (e.g., policy file not found, AntiSamy initialization error)
