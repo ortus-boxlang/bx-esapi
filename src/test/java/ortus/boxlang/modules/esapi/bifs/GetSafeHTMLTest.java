@@ -130,13 +130,34 @@ public class GetSafeHTMLTest extends BaseIntegrationTest {
 		assertThat( variables.getAsString( result ) ).isEqualTo( "" );
 	}
 
-	@DisplayName( "It can build a policy from scratch with a struct" )
+	@DisplayName( "It defaults to ebay base policy when no basePolicy is specified" )
 	@Test
-	public void testStructPolicyFromScratch() {
-		// From scratch: only allow <b> and <i> tags
+	public void testDefaultBasePolicyIsEbay() {
+		// With no basePolicy, struct should behave like ebay
+		// ebay allows <b> and <i>, removes <script>
+		runtime.executeSource(
+		    """
+		    	result = getSafeHTML( "<b>bold</b> <i>italic</i> <script>evil</script>", {
+		    		directives: { maxInputSize: 100000 }
+		    	} );
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( result );
+		assertThat( output ).contains( "<b>bold</b>" );
+		assertThat( output ).contains( "<i>italic</i>" );
+		assertThat( output ).doesNotContain( "<script>" );
+	}
+
+	@DisplayName( "It can build a blank policy with basePolicy=none" )
+	@Test
+	public void testBasePolicyNone() {
+		// basePolicy "none" starts from scratch — only what we define is allowed
 		runtime.executeSource(
 		    """
 		    	result = getSafeHTML( "<b>bold</b> <i>italic</i> <script>evil</script> <div>content</div>", {
+		    		basePolicy: "none",
 		    		directives: { maxInputSize: 100000 },
 		    		allowTags: [ "b", "i" ]
 		    	} );

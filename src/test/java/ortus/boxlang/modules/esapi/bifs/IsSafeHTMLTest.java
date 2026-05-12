@@ -83,14 +83,15 @@ public class IsSafeHTMLTest extends BaseIntegrationTest {
 		assertThat( variables.get( result ) ).isEqualTo( false );
 	}
 
-	@DisplayName( "It can validate with a from-scratch struct policy" )
+	@DisplayName( "It can validate with a struct policy using override mode" )
 	@Test
-	public void testIsSafeHTMLWithFromScratchPolicy() {
-		// Only allow <b> tags — <b> should be safe
+	public void testIsSafeHTMLWithOverridePolicy() {
+		// Override ebay's tag rules to only allow <b> — <b> should be safe
 		runtime.executeSource(
 		    """
 		    	result = IsSafeHTML( "<b>hello</b>", {
-		    		allowTags: [ "b" ]
+		    		overrideMode: "override",
+		    		tagRules: { "b": "validate" }
 		    	} );
 		    """,
 		    context
@@ -98,11 +99,12 @@ public class IsSafeHTMLTest extends BaseIntegrationTest {
 
 		assertThat( variables.get( result ) ).isEqualTo( true );
 
-		// <i> is not allowed so it should be unsafe
+		// <i> is not in our override so it should be unsafe
 		runtime.executeSource(
 		    """
 		    	result = IsSafeHTML( "<i>hello</i>", {
-		    		allowTags: [ "b" ]
+		    		overrideMode: "override",
+		    		tagRules: { "b": "validate" }
 		    	} );
 		    """,
 		    context

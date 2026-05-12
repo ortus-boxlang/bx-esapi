@@ -187,15 +187,33 @@ This module contributes these remaining ESAPI BIFs:
 		}
 	} );
 
-	// Build a policy entirely from scratch - no base policy
+	// Override the default ebay policy with custom directives and restricted tags
 	comment = getSafeHTML( form.comment, {
 		directives: {
-			maxInputSize: 100000,
-			omitXmlDeclaration: "true",
-			omitDoctypeDeclaration: "true",
-			formatOutput: "true"
+			maxInputSize: 100000
 		},
-		allowTags: [ "b", "i", "em", "strong", "p", "br", "ul", "ol", "li" ]
+		overrideMode: "override",
+		tagRules: {
+			"b": "validate",
+			"i": "validate",
+			"em": "validate",
+			"strong": "validate",
+			"p": "validate",
+			"br": "truncate",
+			"ul": "validate",
+			"ol": "validate",
+			"li": "validate"
+		}
+	} );
+
+	// Use slashdot as the base instead of the default ebay
+	comment = getSafeHTML( form.comment, { basePolicy: "slashdot" } );
+
+	// Start from a completely blank policy - only what you define is allowed
+	comment = getSafeHTML( form.comment, {
+		basePolicy: "none",
+		directives: { maxInputSize: 100000 },
+		allowTags: [ "b", "i", "em", "strong", "p", "br" ]
 	} );
 
 	// Validate HTML with a struct policy
@@ -207,13 +225,13 @@ This module contributes these remaining ESAPI BIFs:
 
 ### Struct Policy Configuration
 
-Instead of writing XML policy files, you can pass a struct to `getSafeHTML()` or `isSafeHTML()` to configure an AntiSamy policy programmatically.  You can either override an existing built-in policy or build an entire policy from scratch.
+Instead of writing XML policy files, you can pass a struct to `getSafeHTML()` or `isSafeHTML()` to configure an AntiSamy policy programmatically.  The `basePolicy` defaults to `"ebay"` if not specified, so passing an empty struct is equivalent to using the default string policy.
 
 #### Struct Keys
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `basePolicy` | String | Name of a built-in policy (`ebay`, `slashdot`, etc.) or file path to use as the starting point.  If omitted, a blank policy is created from scratch. |
+| `basePolicy` | String | Name of a built-in policy (`ebay`, `slashdot`, etc.) or file path to use as the starting point.  Defaults to `"ebay"`.  Use `"none"` for a completely blank policy. |
 | `overrideMode` | String | `"merge"` (default) or `"override"`.  In merge mode, your struct keys are layered on top of the base policy.  In override mode, entire sections are replaced. |
 | `directives` | Struct | Key/value pairs for AntiSamy directives like `maxInputSize`, `omitXmlDeclaration`, `formatOutput`, etc. |
 | `allowTags` | Array | Shorthand list of tag names to allow with a `"validate"` action.  Sugar for `tagRules`. |

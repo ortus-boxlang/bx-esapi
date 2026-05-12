@@ -126,7 +126,7 @@ public class AntiSamyUtil {
 	/**
 	 * Build a Policy from a struct configuration. The struct may contain:
 	 * <ul>
-	 * <li>{@code basePolicy} - A named policy or file path to start from (optional)</li>
+	 * <li>{@code basePolicy} - A named policy or file path to start from (defaults to "ebay"). Use "none" for a blank policy.</li>
 	 * <li>{@code overrideMode} - "merge" (default) or "override" - controls how struct keys are applied to the base</li>
 	 * <li>{@code directives} - Struct of directive key/value pairs</li>
 	 * <li>{@code allowTags} - Array of tag names to allow with "validate" action (sugar for tagRules)</li>
@@ -144,21 +144,20 @@ public class AntiSamyUtil {
 	 * @return The built Policy
 	 */
 	public static Policy buildPolicyFromStruct( IStruct config ) {
-		String	basePolicy		= config.getAsString( KEY_BASE_POLICY );
+		String	basePolicy		= StringCaster.cast( config.getOrDefault( KEY_BASE_POLICY, DEFAULT_POLICY ) );
 		String	overrideMode	= StringCaster.cast( config.getOrDefault( KEY_OVERRIDE_MODE, DEFAULT_OVERRIDE_MODE ) );
 		boolean	isMerge			= overrideMode.equalsIgnoreCase( "merge" );
 
 		try {
-			// If we have a base policy, load it as XML DOM and apply overrides
-			if ( basePolicy != null && !basePolicy.isEmpty() ) {
-				validatePolicy( basePolicy );
-				Document doc = loadPolicyAsDocument( basePolicy );
-				applyStructToDocument( doc, config, isMerge );
+			// "none" means build a blank policy from scratch
+			if ( basePolicy.equalsIgnoreCase( "none" ) ) {
+				Document doc = buildDocumentFromStruct( config );
 				return parsePolicyFromDocument( doc );
 			}
 
-			// No base policy — build from scratch
-			Document doc = buildDocumentFromStruct( config );
+			validatePolicy( basePolicy );
+			Document doc = loadPolicyAsDocument( basePolicy );
+			applyStructToDocument( doc, config, isMerge );
 			return parsePolicyFromDocument( doc );
 		} catch ( BoxRuntimeException e ) {
 			throw e;
