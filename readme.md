@@ -131,13 +131,16 @@ This module contributes the following ESAPI decoding BIFs:
 
 This module contributes these remaining ESAPI BIFs:
 
-* `getSafeHTML( string, [policy='ebay'] )` - Sanitize HTML content using the AntiSamy library
+* `getSafeHTML( string, [policy='ebay'], [throwOnError=false] )` - Sanitize HTML content using the AntiSamy library
   * `string` - The HTML string to sanitize
-  * `policy` - The policy to use for sanitization. The default is 'ebay', which is the most restrictive policy. The available policies are: `anythingoes,ebay,myspace,slashdot,tinymce`.  However you can pass a custom policy by using an absolute path to the policy file.
+  * `policy` - The policy to use for sanitization.  Can be a **string** (named policy or file path) or a **struct** for programmatic policy configuration.  The default is `'ebay'`.
+    * **String values**: `anythinggoes`, `ebay`, `myspace`, `slashdot`, `tinymce`, or an absolute path to a custom XML policy file.
+    * **Struct values**: See [Struct Policy Configuration](#struct-policy-configuration) below.
+  * `throwOnError` - If `true`, throws an exception when the HTML violates the policy rules.  If `false` (default), silently returns the sanitized HTML.
 * `isSafeHTML( string, [policy='ebay'] )` - Validate HTML content using the AntiSamy library
-  * `string` - The HTML string to sanitize
-  * `policy` - The policy to use for sanitization. The default is 'ebay', which is the most restrictive policy. The available policies are: `anythingoes,ebay,myspace,slashdot,tinymce`.  However you can pass a custom policy by using an absolute path to the policy file.
-* `sanitizeHTML( string, [policy='ALL'] )` - Sanitizes unsafe HTML to protect against XSS attacks
+  * `string` - The HTML string to validate
+  * `policy` - Same as `getSafeHTML()` above.  Can be a string or struct.
+* `sanitizeHTML( string, [policy='ALL'] )` - Sanitizes unsafe HTML to protect against XSS attacks (uses the OWASP Java HTML Sanitizer, not AntiSamy)
   * `string` - The HTML string to sanitize
   * `policy` - The policy to use for sanitization. The default is 'ALL', which is the most restrictive policy. The available policies are: `BLOCKS, FORMATTING, IMAGES, LINKS, STYLES, TABLES`.  You can also pass a `PolicyFactory` object to use a custom policy (https://javadoc.io/static/com.googlecode.owasp-java-html-sanitizer/owasp-java-html-sanitizer/20191001.1/org/owasp/html/PolicyFactory.html)
 
@@ -163,9 +166,498 @@ This module contributes these remaining ESAPI BIFs:
 </bx:output>
 
 <bx:script>
+	// Use a named policy
 	comment = getSafeHTML( form.comment, "myspace" );
+
+	// Use a custom XML file
 	comment = getSafeHTML( form.comment, "C:/path/to/policy.xml" );
+
+	// Override a built-in policy's directives
+	comment = getSafeHTML( form.comment, {
+		basePolicy: "ebay",
+		directives: { maxInputSize: 500000 }
+	} );
+
+	// Override tag rules on a built-in policy (merge mode is default)
+	comment = getSafeHTML( form.comment, {
+		basePolicy: "ebay",
+		tagRules: {
+			"b": "remove",
+			"iframe": "validate"
+		}
+	} );
+
+	// Override the default ebay policy with custom directives and restricted tags
+	comment = getSafeHTML( form.comment, {
+		directives: {
+			maxInputSize: 100000
+		},
+		overrideMode: "override",
+		tagRules: {
+			"b": "validate",
+			"i": "validate",
+			"em": "validate",
+			"strong": "validate",
+			"p": "validate",
+			"br": "truncate",
+			"ul": "validate",
+			"ol": "validate",
+			"li": "validate"
+		}
+	} );
+
+	// Use slashdot as the base instead of the default ebay
+	comment = getSafeHTML( form.comment, { basePolicy: "slashdot" } );
+
+	// Start from a completely blank policy - only what you define is allowed
+	comment = getSafeHTML( form.comment, {
+		basePolicy: "none",
+		directives: { maxInputSize: 100000 },
+		allowTags: [ "b", "i", "em", "strong", "p", "br" ]
+	} );
+
+	// Validate HTML with a struct policy
+	if( isSafeHTML( form.comment, { basePolicy: "slashdot" } ) ) {
+		// comment is safe
+	}
 </bx:script>
+```
+
+### Struct Policy Configuration
+
+Instead of writing XML policy files, you can pass a struct to `getSafeHTML()` or `isSafeHTML()` to configure an AntiSamy policy programmatically.  The `basePolicy` defaults to `"ebay"` if not specified, so passing an empty struct is equivalent to using the default string policy.
+
+#### Struct Keys
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `basePolicy` | String | Name of a built-in policy (`ebay`, `slashdot`, etc.) or file path to use as the starting point.  Defaults to `"ebay"`.  Use `"none"` for a completely blank policy. |
+| `overrideMode` | String | `"merge"` (default) or `"override"`.  In merge mode, your struct keys are layered on top of the base policy.  In override mode, entire sections are replaced. |
+| `directives` | Struct | Key/value pairs for AntiSamy directives like `maxInputSize`, `omitXmlDeclaration`, `formatOutput`, etc. |
+| `allowTags` | Array | Shorthand list of tag names to allow with a `"validate"` action.  Sugar for `tagRules`. |
+| `tagRules` | Struct | Tag name to either an action string (`"validate"`, `"filter"`, `"remove"`, `"truncate"`) or a struct with `action` and `attributes`. |
+| `globalAttributes` | Struct | Attribute definitions that apply to all allowed tags.  Each key is an attribute name, each value is a config struct with `regexps`, `allowedValues`, `onInvalid`, `description`. |
+| `dynamicAttributes` | Struct | Attribute patterns (e.g. `"data-.*"`) with the same config as `globalAttributes`. |
+| `cssRules` | Struct | CSS property name to config struct with `regexps`, `allowedValues`, `shorthandRefs`, `description`. |
+| `allowedEmptyTags` | Array | Tag names that are allowed to be self-closing / empty (e.g. `["br", "hr", "img"]`). |
+| `requireClosingTags` | Array | Tag names that require explicit closing tags. |
+| `tagsToEncode` | Array | Tag names that should be HTML-entity-encoded rather than removed. |
+
+#### Tag Rule Struct Format
+
+When a tag rule value is a struct instead of a simple action string, it can define per-tag attribute rules:
+
+```javascript
+tagRules: {
+	"a": {
+		action: "validate",
+		attributes: {
+			"href": {
+				regexps: [ "https?://[^\\s]*" ],
+				onInvalid: "removeTag"
+			},
+			"rel": {
+				allowedValues: [ "nofollow", "noopener" ]
+			}
+		}
+	},
+	"img": {
+		action: "validate",
+		attributes: {
+			"src": {
+				regexps: [ "https?://[^\\s]*" ],
+				onInvalid: "removeTag"
+			},
+			"alt": {
+				regexps: [ "[\\p{L}\\p{N}\\s\\-_',\\.]*" ]
+			}
+		}
+	},
+	"script": "remove",
+	"b": "validate"
+}
+```
+
+#### Struct Equivalents of Built-In Policies
+
+Below are struct representations of two of the built-in AntiSamy policies.  These produce equivalent behavior to using the named string policy and can serve as a starting point for your own custom policies.
+
+##### Slashdot Policy (`"slashdot"`)
+
+The Slashdot policy is very restrictive - basic formatting, links, and lists only.  No CSS, no images.
+
+```javascript
+slashdotPolicy = {
+	directives: {
+		omitXmlDeclaration: "true",
+		omitDoctypeDeclaration: "true",
+		maxInputSize: 5000,
+		formatOutput: "true",
+		embedStyleSheets: "false"
+	},
+	globalAttributes: {
+		"title": {
+			regexps: [ "[\\p{L}\\p{N}\\s\\-_',:\\[\\]!\\./\\\\\\(\\)&]*" ]
+		},
+		"lang": {
+			regexps: [ "[a-zA-Z0-9-]{2,20}" ]
+		}
+	},
+	tagRules: {
+		"script": "remove",
+		"noscript": "remove",
+		"iframe": "remove",
+		"frameset": "remove",
+		"frame": "remove",
+		"noframes": "remove",
+		"style": "remove",
+		"p": {
+			action: "validate",
+			attributes: {
+				"align": {
+					allowedValues: [ "center", "left", "right", "justify", "char" ]
+				}
+			}
+		},
+		"div": "validate",
+		"i": "validate",
+		"b": "validate",
+		"em": "validate",
+		"blockquote": "validate",
+		"tt": "validate",
+		"strong": "validate",
+		"br": "truncate",
+		"quote": "validate",
+		"ecode": "validate",
+		"a": {
+			action: "validate",
+			attributes: {
+				"href": {
+					regexps: [
+						"^(?!//)(?![\\p{L}\\p{N}\\\\\\.\\#@\\$%\\+&;\\-_~,\\?=/!]*(&colon))[\\p{L}\\p{N}\\\\\\.\\#@\\$%\\+&;\\-_~,\\?=/!]*",
+						"(\\s)*((ht|f)tp(s?)://|mailto:)[\\p{L}\\p{N}]+[~\\p{L}\\p{N}\\p{Zs}\\-_\\.@\\#\\$%&;:,\\?=/\\+!\\(\\)]*(\s)*"
+					],
+					onInvalid: "filterTag"
+				},
+				"nohref": {
+					allowedValues: [ "nohref", "" ]
+				},
+				"rel": {
+					allowedValues: [ "nofollow" ]
+				}
+			}
+		},
+		"ul": "validate",
+		"ol": "validate",
+		"li": "validate"
+	},
+	tagsToEncode: [ "g", "grin" ],
+	allowedEmptyTags: [
+		"br", "hr", "a", "img", "link", "iframe", "script", "object",
+		"applet", "frame", "base", "param", "meta", "input", "textarea",
+		"embed", "basefont", "col", "div"
+	]
+};
+
+// Usage:
+comment = getSafeHTML( form.comment, slashdotPolicy );
+```
+
+##### eBay Policy (`"ebay"`)
+
+The eBay policy is more permissive - allows formatting, tables, images, links, CSS styling, and many more tags.
+
+```javascript
+ebayPolicy = {
+	directives: {
+		omitXmlDeclaration: "true",
+		omitDoctypeDeclaration: "true",
+		maxInputSize: 20000,
+		formatOutput: "true",
+		embedStyleSheets: "false"
+	},
+	globalAttributes: {
+		"id": {
+			regexps: [ "[a-zA-Z0-9:\\-_\\.]+" ]
+		},
+		"style": {},
+		"title": {
+			regexps: [ "[\\p{L}\\p{N}\\s\\-_',:\\[\\]!\\./\\\\\\(\\)&]*" ]
+		},
+		"class": {
+			regexps: [ "[a-zA-Z0-9\\s,\\-_]+" ]
+		},
+		"lang": {
+			regexps: [ "[a-zA-Z0-9-]{2,20}" ]
+		}
+	},
+	tagRules: {
+		"script": "remove",
+		"noscript": "validate",
+		"iframe": "remove",
+		"frameset": "remove",
+		"frame": "remove",
+		"label": {
+			action: "validate",
+			attributes: {
+				"for": {
+					regexps: [ "[a-zA-Z0-9:\\-_\\.]+" ]
+				}
+			}
+		},
+		"h1": "validate",
+		"h2": "validate",
+		"h3": "validate",
+		"h4": "validate",
+		"h5": "validate",
+		"h6": "validate",
+		"p": {
+			action: "validate",
+			attributes: {
+				"align": {
+					allowedValues: [ "center", "middle", "left", "right", "justify", "char" ]
+				}
+			}
+		},
+		"i": "validate",
+		"b": "validate",
+		"u": "validate",
+		"strong": "validate",
+		"em": "validate",
+		"small": "validate",
+		"big": "validate",
+		"pre": "validate",
+		"code": "validate",
+		"cite": "validate",
+		"samp": "validate",
+		"sub": "validate",
+		"sup": "validate",
+		"strike": "validate",
+		"center": "validate",
+		"blockquote": "validate",
+		"hr": "validate",
+		"br": "validate",
+		"font": {
+			action: "validate",
+			attributes: {
+				"color": {
+					regexps: [
+						"(aqua|black|blue|fuchsia|gray|grey|green|lime|maroon|navy|olive|purple|red|silver|teal|white|yellow)",
+						"(#([0-9a-fA-F]{6}|[0-9a-fA-F]{3}))"
+					]
+				},
+				"face": {
+					regexps: [ "[\\w;, \\-]+" ]
+				},
+				"size": {
+					regexps: [ "(\\+|-){0,1}(\\d)+" ]
+				}
+			}
+		},
+		"a": {
+			action: "validate",
+			attributes: {
+				"href": {
+					regexps: [
+						"^(?!//)(?![\\p{L}\\p{N}\\\\\\.\\#@\\$%\\+&;\\-_~,\\?=/!]*(&colon))[\\p{L}\\p{N}\\\\\\.\\#@\\$%\\+&;\\-_~,\\?=/!]*",
+						"(\\s)*((ht|f)tp(s?)://|mailto:)[\\p{L}\\p{N}]+[\\p{L}\\p{N}\\p{Zs}\\.\\#@\\$%\\+&;:\\-_~,\\?=/!\\(\\)]*(\s)*"
+					]
+				},
+				"nohref": {
+					regexps: [ ".*" ]
+				},
+				"rel": {
+					allowedValues: [ "nofollow" ]
+				},
+				"name": {
+					regexps: [ "[a-zA-Z0-9\\-_\\$]+" ]
+				}
+			}
+		},
+		"map": "validate",
+		"style": {
+			action: "validate",
+			attributes: {
+				"type": {
+					allowedValues: [ "text/css" ]
+				}
+			}
+		},
+		"span": "validate",
+		"div": {
+			action: "validate",
+			attributes: {
+				"align": {
+					allowedValues: [ "center", "middle", "left", "right", "justify", "char" ]
+				}
+			}
+		},
+		"img": {
+			action: "validate",
+			attributes: {
+				"src": {
+					regexps: [
+						"^(?!//)(?![\\p{L}\\p{N}\\\\\\.\\#@\\$%\\+&;\\-_~,\\?=/!]*(&colon))[\\p{L}\\p{N}\\\\\\.\\#@\\$%\\+&;\\-_~,\\?=/!]*",
+						"(\\s)*((ht|f)tp(s?)://|mailto:)[\\p{L}\\p{N}]+[\\p{L}\\p{N}\\p{Zs}\\.\\#@\\$%\\+&;:\\-_~,\\?=/!\\(\\)]*(\s)*"
+					],
+					onInvalid: "removeTag"
+				},
+				"name": {
+					regexps: [ "[a-zA-Z0-9\\-_\\$]+" ]
+				},
+				"alt": {
+					regexps: [ "[\\p{L}\\p{N},'\\. \\s\\-_\\(\\)&;]*" ]
+				},
+				"height": { regexps: [ "(\\d)+(%{0,1})" ] },
+				"width": { regexps: [ "(\\d)+(%{0,1})" ] },
+				"border": { regexps: [ "(-|\\+)?([0-9]+(\\.[0-9]+)?)" ] },
+				"align": {
+					allowedValues: [ "center", "middle", "left", "right", "justify", "char" ]
+				},
+				"hspace": { regexps: [ "(-|\\+)?([0-9]+(\\.[0-9]+)?)" ] },
+				"vspace": { regexps: [ "(-|\\+)?([0-9]+(\\.[0-9]+)?)" ] }
+			}
+		},
+		"link": {
+			action: "validate",
+			attributes: {
+				"type": {
+					allowedValues: [ "text/css", "application/rss+xml", "image/x-icon" ],
+					onInvalid: "removeTag"
+				},
+				"rel": {
+					allowedValues: [ "stylesheet", "shortcut icon", "search", "copyright", "top", "alternate" ]
+				}
+			}
+		},
+		"ul": "validate",
+		"ol": "validate",
+		"li": "validate",
+		"dd": "truncate",
+		"dl": "truncate",
+		"dt": "truncate",
+		"thead": {
+			action: "validate",
+			attributes: {
+				"align": {
+					allowedValues: [ "center", "middle", "left", "right", "justify", "char" ]
+				}
+			}
+		},
+		"tbody": {
+			action: "validate",
+			attributes: {
+				"align": {
+					allowedValues: [ "center", "middle", "left", "right", "justify", "char" ]
+				}
+			}
+		},
+		"tfoot": {
+			action: "validate",
+			attributes: {
+				"align": {
+					allowedValues: [ "center", "middle", "left", "right", "justify", "char" ]
+				}
+			}
+		},
+		"table": {
+			action: "validate",
+			attributes: {
+				"height": { regexps: [ "(\\d)+(%{0,1})" ] },
+				"width": { regexps: [ "(\\d)+(%{0,1})" ] },
+				"border": { regexps: [ "(-|\\+)?([0-9]+(\\.[0-9]+)?)" ] },
+				"bgcolor": {
+					regexps: [
+						"(aqua|black|blue|fuchsia|gray|grey|green|lime|maroon|navy|olive|purple|red|silver|teal|white|yellow)",
+						"(#([0-9a-fA-F]{6}|[0-9a-fA-F]{3}))"
+					]
+				},
+				"cellpadding": { regexps: [ "(-|\\+)?([0-9]+(\\.[0-9]+)?)" ] },
+				"cellspacing": { regexps: [ "(-|\\+)?([0-9]+(\\.[0-9]+)?)" ] },
+				"align": {
+					allowedValues: [ "center", "middle", "left", "right", "justify", "char" ]
+				}
+			}
+		},
+		"td": {
+			action: "validate",
+			attributes: {
+				"align": {
+					allowedValues: [ "center", "middle", "left", "right", "justify", "char" ]
+				},
+				"bgcolor": {
+					regexps: [
+						"(aqua|black|blue|fuchsia|gray|grey|green|lime|maroon|navy|olive|purple|red|silver|teal|white|yellow)",
+						"(#([0-9a-fA-F]{6}|[0-9a-fA-F]{3}))"
+					]
+				},
+				"height": { regexps: [ "(\\d)+(%{0,1})" ] },
+				"width": { regexps: [ "(\\d)+(%{0,1})" ] },
+				"colspan": { regexps: [ "(-|\\+)?([0-9]+(\\.[0-9]+)?)" ] },
+				"rowspan": { regexps: [ "(-|\\+)?([0-9]+(\\.[0-9]+)?)" ] }
+			}
+		},
+		"th": {
+			action: "validate",
+			attributes: {
+				"align": {
+					allowedValues: [ "center", "middle", "left", "right", "justify", "char" ]
+				},
+				"bgcolor": {
+					regexps: [
+						"(aqua|black|blue|fuchsia|gray|grey|green|lime|maroon|navy|olive|purple|red|silver|teal|white|yellow)",
+						"(#([0-9a-fA-F]{6}|[0-9a-fA-F]{3}))"
+					]
+				},
+				"height": { regexps: [ "(\\d)+(%{0,1})" ] },
+				"width": { regexps: [ "(\\d)+(%{0,1})" ] },
+				"colspan": { regexps: [ "(-|\\+)?([0-9]+(\\.[0-9]+)?)" ] },
+				"rowspan": { regexps: [ "(-|\\+)?([0-9]+(\\.[0-9]+)?)" ] }
+			}
+		},
+		"tr": {
+			action: "validate",
+			attributes: {
+				"height": { regexps: [ "(\\d)+(%{0,1})" ] },
+				"width": { regexps: [ "(\\d)+(%{0,1})" ] },
+				"align": {
+					allowedValues: [ "center", "middle", "left", "right", "justify", "char" ]
+				}
+			}
+		},
+		"colgroup": {
+			action: "validate",
+			attributes: {
+				"span": { regexps: [ "(-|\\+)?([0-9]+(\\.[0-9]+)?)" ] },
+				"width": { regexps: [ "(\\d)+(%{0,1})" ] },
+				"align": {
+					allowedValues: [ "center", "middle", "left", "right", "justify", "char" ]
+				}
+			}
+		},
+		"col": {
+			action: "validate",
+			attributes: {
+				"align": {
+					allowedValues: [ "center", "middle", "left", "right", "justify", "char" ]
+				},
+				"span": { regexps: [ "(-|\\+)?([0-9]+(\\.[0-9]+)?)" ] },
+				"width": { regexps: [ "(\\d)+(%{0,1})" ] }
+			}
+		},
+		"fieldset": "validate",
+		"legend": "validate"
+	},
+	tagsToEncode: [ "g", "grin" ],
+	allowedEmptyTags: [
+		"br", "hr", "a", "img", "link", "iframe", "script", "object",
+		"applet", "frame", "base", "param", "meta", "input", "textarea",
+		"embed", "basefont", "col", "div"
+	]
+};
+
+// Usage:
+comment = getSafeHTML( form.comment, ebayPolicy );
 ```
 
 ----

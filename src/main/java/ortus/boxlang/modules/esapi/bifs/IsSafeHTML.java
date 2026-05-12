@@ -16,6 +16,7 @@ package ortus.boxlang.modules.esapi.bifs;
 
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.CleanResults;
+import org.owasp.validator.html.Policy;
 
 import ortus.boxlang.modules.esapi.util.AntiSamyUtil;
 import ortus.boxlang.modules.esapi.util.KeyDirectory;
@@ -27,6 +28,7 @@ import ortus.boxlang.runtime.scopes.ArgumentsScope;
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.types.Argument;
 import ortus.boxlang.runtime.types.BoxLangType;
+import ortus.boxlang.runtime.types.IStruct;
 import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
 
 @BoxBIF
@@ -40,56 +42,57 @@ public class IsSafeHTML extends BIF {
 		super();
 		declaredArguments = new Argument[] {
 		    new Argument( true, Argument.STRING, Key.string ),
-		    new Argument( false, Argument.STRING, KeyDirectory.policy, "" )
+		    new Argument( false, Argument.ANY, KeyDirectory.policy, "" )
 		};
 	}
 
 	/**
 	 * Verifies if the HTML is safe using antisamy policy rules.
-	 * If no policy is provided, the default policy is used which is the eBay policy.
 	 * <p>
-	 * Available policies are:
-	 * <ul>
-	 * <li>anythinggoes</li>
-	 * <li>ebay</li>
-	 * <li>myspace</li>
-	 * <li>slashdot</li>
-	 * <li>tinymce</li>
-	 * </ul>
+	 * The policy can be a string name of a built-in policy, a file path to a custom policy XML file,
+	 * or a struct for programmatic policy configuration. See {@code getSafeHTML()} for full struct documentation.
 	 * <p>
-	 * If a policy is not one of the above, it is assumed to be an absolute path to a custom policy file.
+	 * Built-in policies: anythinggoes, ebay (default), myspace, slashdot, tinymce
 	 *
 	 * @param context   The current Box context
 	 * @param arguments The arguments passed to the function
 	 *
-	 * @arguments.string The HTML to sanitize
+	 * @arguments.string The HTML to validate
 	 *
-	 * @arguments.policy The policy to use for sanitization
+	 * @arguments.policy The policy to use: a string name, file path, or a struct for programmatic configuration
 	 *
 	 * @return True if the HTML is safe, false otherwise
 	 */
 	public Object _invoke( IBoxContext context, ArgumentsScope arguments ) {
-		// Get the input and policy
-		String	input	= arguments.getAsString( Key.string ).trim();
-		String	policy	= arguments.getAsString( KeyDirectory.policy ).trim();
+		String	input		= arguments.getAsString( Key.string ).trim();
+		Object	policyArg	= arguments.get( KeyDirectory.policy );
 
-		// Set default policy if not set
+		try {
+			Policy			loadedPolicy	= resolvePolicy( policyArg );
+			CleanResults	results			= new AntiSamy().scan( input, loadedPolicy );
+			return results.getNumberOfErrors() == 0;
+		} catch ( BoxRuntimeException e ) {
+			throw e;
+		} catch ( Exception e ) {
+			throw new BoxRuntimeException( "Error while checking HTML safety: " + e.getMessage(), e );
+		}
+	}
+
+	/**
+	 * Resolve a policy argument to a Policy object.
+	 */
+	private Policy resolvePolicy( Object policyArg ) {
+		if ( policyArg instanceof IStruct structPolicy ) {
+			return AntiSamyUtil.buildPolicyFromStruct( structPolicy );
+		}
+
+		String policy = policyArg.toString().trim();
 		if ( policy.isEmpty() ) {
 			policy = AntiSamyUtil.DEFAULT_POLICY;
 		}
 
-		// Try to see if the passed policy is in our list of policies
-		// Else, it must be a path to a policy file, verify it exists, else throw an exception
 		AntiSamyUtil.validatePolicy( policy );
-
-		try {
-			// Scan the input and get clean results
-			CleanResults results = new AntiSamy().scan( input, AntiSamyUtil.loadPolicy( policy ) );
-			return results.getNumberOfErrors() == 0;
-		} catch ( Exception e ) {
-			// Handle exceptions (e.g., policy file not found, AntiSamy initialization error)
-			throw new BoxRuntimeException( "Error while checking HTML safety: " + e.getMessage(), e );
-		}
+		return AntiSamyUtil.loadPolicy( policy );
 	}
 
 }

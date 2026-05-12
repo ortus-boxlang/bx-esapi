@@ -55,4 +55,62 @@ public class IsSafeHTMLTest extends BaseIntegrationTest {
 		assertThat( variables.get( result ) ).isEqualTo( false );
 	}
 
+	@DisplayName( "It can validate with a struct policy using basePolicy" )
+	@Test
+	public void testIsSafeHTMLWithStructPolicy() {
+		// Safe HTML with a struct policy based on ebay
+		runtime.executeSource(
+		    """
+		    	result = IsSafeHTML( "<b>hello</b>", {
+		    		basePolicy: "ebay"
+		    	} );
+		    """,
+		    context
+		);
+
+		assertThat( variables.get( result ) ).isEqualTo( true );
+
+		// Unsafe HTML should still be detected
+		runtime.executeSource(
+		    """
+		    	result = IsSafeHTML( "<script>alert('hello');</script>", {
+		    		basePolicy: "ebay"
+		    	} );
+		    """,
+		    context
+		);
+
+		assertThat( variables.get( result ) ).isEqualTo( false );
+	}
+
+	@DisplayName( "It can validate with a struct policy using override mode" )
+	@Test
+	public void testIsSafeHTMLWithOverridePolicy() {
+		// Override ebay's tag rules to only allow <b> — <b> should be safe
+		runtime.executeSource(
+		    """
+		    	result = IsSafeHTML( "<b>hello</b>", {
+		    		overrideMode: "override",
+		    		tagRules: { "b": "validate" }
+		    	} );
+		    """,
+		    context
+		);
+
+		assertThat( variables.get( result ) ).isEqualTo( true );
+
+		// <i> is not in our override so it should be unsafe
+		runtime.executeSource(
+		    """
+		    	result = IsSafeHTML( "<i>hello</i>", {
+		    		overrideMode: "override",
+		    		tagRules: { "b": "validate" }
+		    	} );
+		    """,
+		    context
+		);
+
+		assertThat( variables.get( result ) ).isEqualTo( false );
+	}
+
 }

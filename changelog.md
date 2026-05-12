@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `getSafeHTML()` and `isSafeHTML()` now accept a struct for programmatic policy configuration in addition to a string policy name
+- Struct policies support overriding a built-in base policy (merge or override mode) or building an entire policy from scratch
+- Supported struct keys: `basePolicy`, `overrideMode`, `directives`, `allowTags`, `tagRules`, `globalAttributes`, `dynamicAttributes`, `cssRules`, `allowedEmptyTags`, `requireClosingTags`, `tagsToEncode`
+- Added `throwOnError` boolean argument to `getSafeHTML()` (default `false`) — when `true`, throws an exception if HTML violates policy rules instead of silently returning sanitized output
+
+### Changed
+
+- Replaced reflection-based AntiSamy policy override approach with clean XML DOM generation
+
 ## [1.7.0] - 2026-01-09
 
 ## [1.6.0] - 2025-07-02
