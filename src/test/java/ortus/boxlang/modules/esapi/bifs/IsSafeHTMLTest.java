@@ -55,4 +55,60 @@ public class IsSafeHTMLTest extends BaseIntegrationTest {
 		assertThat( variables.get( result ) ).isEqualTo( false );
 	}
 
+	@DisplayName( "It can validate with a struct policy using basePolicy" )
+	@Test
+	public void testIsSafeHTMLWithStructPolicy() {
+		// Safe HTML with a struct policy based on ebay
+		runtime.executeSource(
+		    """
+		    	result = IsSafeHTML( "<b>hello</b>", {
+		    		basePolicy: "ebay"
+		    	} );
+		    """,
+		    context
+		);
+
+		assertThat( variables.get( result ) ).isEqualTo( true );
+
+		// Unsafe HTML should still be detected
+		runtime.executeSource(
+		    """
+		    	result = IsSafeHTML( "<script>alert('hello');</script>", {
+		    		basePolicy: "ebay"
+		    	} );
+		    """,
+		    context
+		);
+
+		assertThat( variables.get( result ) ).isEqualTo( false );
+	}
+
+	@DisplayName( "It can validate with a from-scratch struct policy" )
+	@Test
+	public void testIsSafeHTMLWithFromScratchPolicy() {
+		// Only allow <b> tags — <b> should be safe
+		runtime.executeSource(
+		    """
+		    	result = IsSafeHTML( "<b>hello</b>", {
+		    		allowTags: [ "b" ]
+		    	} );
+		    """,
+		    context
+		);
+
+		assertThat( variables.get( result ) ).isEqualTo( true );
+
+		// <i> is not allowed so it should be unsafe
+		runtime.executeSource(
+		    """
+		    	result = IsSafeHTML( "<i>hello</i>", {
+		    		allowTags: [ "b" ]
+		    	} );
+		    """,
+		    context
+		);
+
+		assertThat( variables.get( result ) ).isEqualTo( false );
+	}
+
 }
