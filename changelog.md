@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Updates
+
+- Bump com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer from 20260102.1 to 20260313.1
+
+### Fixed
+
+- Fixed changelog so we could publish github releases.
+
 ## [1.8.0] - 2026-05-12
 
 ### Added
@@ -28,20 +36,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.5.0] - 2025-06-09
 
-## [1.4.0] - 2025-05-26
-
 ### Added
 
 - Bumps org.owasp.esapi:esapi from 2.6.2.0 to 2.7.0.0.
 - Enabled `encodeForSQL()` due to being off by default in 2.7
-
-## [1.5.0] - 2025-06-09
-
-## [1.4.0] - 2025-05-26
-
-### Added
-
-- Bump org.owasp.esapi:esapi from 2.6.1.0 to 2.6.2.0
 
 ## [1.4.0] - 2025-05-26
 
