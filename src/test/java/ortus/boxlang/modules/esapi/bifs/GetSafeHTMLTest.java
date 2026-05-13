@@ -92,12 +92,12 @@ public class GetSafeHTMLTest extends BaseIntegrationTest {
 	@DisplayName( "It can force struct policy recreation by evicting cache" )
 	@Test
 	public void testForceStructPolicyRecreation() {
-		IStruct policyConfig = Struct.of(
+		IStruct	policyConfig	= Struct.of(
 		    "basePolicy", "ebay",
 		    "directives", Struct.of( "maxInputSize", "100000" )
 		);
 
-		Policy firstPolicy = AntiSamyUtil.buildPolicyFromStruct( policyConfig );
+		Policy	firstPolicy		= AntiSamyUtil.buildPolicyFromStruct( policyConfig );
 
 		variables.put( Key.of( "policyConfig" ), policyConfig );
 		runtime.executeSource(

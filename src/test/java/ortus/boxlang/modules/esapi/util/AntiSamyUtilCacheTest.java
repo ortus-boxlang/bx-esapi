@@ -20,7 +20,7 @@ public class AntiSamyUtilCacheTest {
 	@DisplayName( "buildPolicyFromStruct caches and reuses a policy for the same struct instance" )
 	@Test
 	public void testCacheHitForSameStructInstance() {
-		IStruct config = Struct.of(
+		IStruct	config	= Struct.of(
 		    "basePolicy", "ebay",
 		    "directives", Struct.of(
 		        "maxInputSize", "100000",
@@ -28,8 +28,8 @@ public class AntiSamyUtilCacheTest {
 		    )
 		);
 
-		Policy first = AntiSamyUtil.buildPolicyFromStruct( config );
-		Policy second = AntiSamyUtil.buildPolicyFromStruct( config );
+		Policy	first	= AntiSamyUtil.buildPolicyFromStruct( config );
+		Policy	second	= AntiSamyUtil.buildPolicyFromStruct( config );
 
 		assertThat( second ).isSameInstanceAs( first );
 	}
@@ -37,20 +37,20 @@ public class AntiSamyUtilCacheTest {
 	@DisplayName( "buildPolicyFromStruct caches equivalent configs even when nested key ordering differs" )
 	@Test
 	public void testCacheHitForEquivalentStructsWithDifferentOrdering() {
-		IStruct tagRuleAttrsA = Struct.of(
+		IStruct	tagRuleAttrsA	= Struct.of(
 		    "href", Struct.of(
 		        "description", "link href",
 		        "onInvalid", "removeAttribute"
 		    )
 		);
-		IStruct tagRuleAttrsB = Struct.of(
+		IStruct	tagRuleAttrsB	= Struct.of(
 		    "href", Struct.of(
 		        "onInvalid", "removeAttribute",
 		        "description", "link href"
 		    )
 		);
 
-		IStruct configA = Struct.of(
+		IStruct	configA			= Struct.of(
 		    "basePolicy", "ebay",
 		    "overrideMode", "merge",
 		    "directives", Struct.of(
@@ -66,7 +66,7 @@ public class AntiSamyUtilCacheTest {
 		    )
 		);
 
-		IStruct configB = Struct.of(
+		IStruct	configB			= Struct.of(
 		    "tagRules", Struct.of(
 		        "b", "validate",
 		        "a", Struct.of(
@@ -82,8 +82,8 @@ public class AntiSamyUtilCacheTest {
 		    "basePolicy", "ebay"
 		);
 
-		Policy first = AntiSamyUtil.buildPolicyFromStruct( configA );
-		Policy second = AntiSamyUtil.buildPolicyFromStruct( configB );
+		Policy	first			= AntiSamyUtil.buildPolicyFromStruct( configA );
+		Policy	second			= AntiSamyUtil.buildPolicyFromStruct( configB );
 
 		assertThat( second ).isSameInstanceAs( first );
 	}
@@ -91,14 +91,14 @@ public class AntiSamyUtilCacheTest {
 	@DisplayName( "clearPolicyCache forces policy rebuild" )
 	@Test
 	public void testClearPolicyCacheForcesRebuild() {
-		IStruct config = Struct.of(
+		IStruct	config	= Struct.of(
 		    "basePolicy", "ebay",
 		    "directives", Struct.of(
 		        "maxInputSize", "100000"
 		    )
 		);
 
-		Policy first = AntiSamyUtil.buildPolicyFromStruct( config );
+		Policy	first	= AntiSamyUtil.buildPolicyFromStruct( config );
 		AntiSamyUtil.clearPolicyCache();
 		Policy second = AntiSamyUtil.buildPolicyFromStruct( config );
 
