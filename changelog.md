@@ -9,9 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Updates
+### Improvements
 
 - Bump com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer from 20260102.1 to 20260313.1
+- Added struct policy caching and eviction capabilities for `getSafeHTML()` and `isSafeHTML()`
+- Added `force` boolean argument to `getSafeHTML()` and `isSafeHTML()` for struct policies to evict cached compiled policy entries and rebuild on demand
 
 ### Fixed
 

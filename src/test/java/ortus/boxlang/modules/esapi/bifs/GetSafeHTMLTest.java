@@ -5,9 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.owasp.validator.html.Policy;
 
 import ortus.boxlang.modules.esapi.BaseIntegrationTest;
+import ortus.boxlang.modules.esapi.util.AntiSamyUtil;
 import ortus.boxlang.runtime.scopes.Key;
+import ortus.boxlang.runtime.types.IStruct;
+import ortus.boxlang.runtime.types.Struct;
 import ortus.boxlang.runtime.types.exceptions.BoxRuntimeException;
 
 public class GetSafeHTMLTest extends BaseIntegrationTest {
@@ -83,6 +87,28 @@ public class GetSafeHTMLTest extends BaseIntegrationTest {
 		    """,
 		    context
 		) );
+	}
+
+	@DisplayName( "It can force struct policy recreation by evicting cache" )
+	@Test
+	public void testForceStructPolicyRecreation() {
+		IStruct policyConfig = Struct.of(
+		    "basePolicy", "ebay",
+		    "directives", Struct.of( "maxInputSize", "100000" )
+		);
+
+		Policy firstPolicy = AntiSamyUtil.buildPolicyFromStruct( policyConfig );
+
+		variables.put( Key.of( "policyConfig" ), policyConfig );
+		runtime.executeSource(
+		    "result = getSafeHTML( '<b>hello</b>', policyConfig, false, true );",
+		    context
+		);
+
+		Policy secondPolicy = AntiSamyUtil.buildPolicyFromStruct( policyConfig );
+
+		assertThat( variables.getAsString( result ) ).isEqualTo( "<b>hello</b>" );
+		assertThat( secondPolicy ).isNotSameInstanceAs( firstPolicy );
 	}
 
 	@DisplayName( "It can override directives via a struct policy with basePolicy" )

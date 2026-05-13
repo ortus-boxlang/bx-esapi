@@ -4,8 +4,13 @@ import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.owasp.validator.html.Policy;
 
 import ortus.boxlang.modules.esapi.BaseIntegrationTest;
+import ortus.boxlang.modules.esapi.util.AntiSamyUtil;
+import ortus.boxlang.runtime.scopes.Key;
+import ortus.boxlang.runtime.types.IStruct;
+import ortus.boxlang.runtime.types.Struct;
 
 public class IsSafeHTMLTest extends BaseIntegrationTest {
 
@@ -111,6 +116,28 @@ public class IsSafeHTMLTest extends BaseIntegrationTest {
 		);
 
 		assertThat( variables.get( result ) ).isEqualTo( false );
+	}
+
+	@DisplayName( "It can force struct policy recreation by evicting cache" )
+	@Test
+	public void testForceStructPolicyRecreation() {
+		IStruct policyConfig = Struct.of(
+		    "basePolicy", "ebay",
+		    "directives", Struct.of( "maxInputSize", "100000" )
+		);
+
+		Policy firstPolicy = AntiSamyUtil.buildPolicyFromStruct( policyConfig );
+
+		variables.put( Key.of( "policyConfig" ), policyConfig );
+		runtime.executeSource(
+		    "result = isSafeHTML( '<b>hello</b>', policyConfig, true );",
+		    context
+		);
+
+		Policy secondPolicy = AntiSamyUtil.buildPolicyFromStruct( policyConfig );
+
+		assertThat( variables.get( result ) ).isEqualTo( true );
+		assertThat( secondPolicy ).isNotSameInstanceAs( firstPolicy );
 	}
 
 }

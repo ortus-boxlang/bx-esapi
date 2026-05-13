@@ -20,6 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -78,6 +82,28 @@ public class AntiSamyUtil {
 	private static final Key	KEY_ON_INVALID				= Key.of( "onInvalid" );
 	private static final Key	KEY_DESCRIPTION				= Key.of( "description" );
 	private static final Key	KEY_SHORTHAND_REFS			= Key.of( "shorthandRefs" );
+
+	/**
+	 * Top-level config keys in deterministic order for cache key generation.
+	 */
+	private static final Key[]	CONFIG_KEYS				= new Key[] {
+	    KEY_BASE_POLICY,
+	    KEY_OVERRIDE_MODE,
+	    KEY_DIRECTIVES,
+	    KEY_ALLOW_TAGS,
+	    KEY_TAG_RULES,
+	    KEY_GLOBAL_ATTRIBUTES,
+	    KEY_DYNAMIC_ATTRIBUTES,
+	    KEY_CSS_RULES,
+	    KEY_ALLOWED_EMPTY_TAGS,
+	    KEY_REQUIRE_CLOSING_TAGS,
+	    KEY_TAGS_TO_ENCODE
+	};
+
+	/**
+	 * Cache for policies built from struct configs.
+	 */
+	private static final ConcurrentHashMap<String, Policy>	POLICY_CACHE		= new ConcurrentHashMap<>();
 
 	/**
 	 * Available Policies in the AntiSamy library
@@ -144,26 +170,108 @@ public class AntiSamyUtil {
 	 * @return The built Policy
 	 */
 	public static Policy buildPolicyFromStruct( IStruct config ) {
+		String cacheKey = buildConfigCacheKey( config );
+		Policy cachedPolicy = POLICY_CACHE.get( cacheKey );
+		if ( cachedPolicy != null ) {
+			return cachedPolicy;
+		}
+
 		String	basePolicy		= StringCaster.cast( config.getOrDefault( KEY_BASE_POLICY, DEFAULT_POLICY ) );
 		String	overrideMode	= StringCaster.cast( config.getOrDefault( KEY_OVERRIDE_MODE, DEFAULT_OVERRIDE_MODE ) );
 		boolean	isMerge			= overrideMode.equalsIgnoreCase( "merge" );
 
 		try {
+			Policy builtPolicy;
+
 			// "none" means build a blank policy from scratch
 			if ( basePolicy.equalsIgnoreCase( "none" ) ) {
 				Document doc = buildDocumentFromStruct( config );
-				return parsePolicyFromDocument( doc );
+				builtPolicy = parsePolicyFromDocument( doc );
+			} else {
+				validatePolicy( basePolicy );
+				Document doc = loadPolicyAsDocument( basePolicy );
+				applyStructToDocument( doc, config, isMerge );
+				builtPolicy = parsePolicyFromDocument( doc );
 			}
 
-			validatePolicy( basePolicy );
-			Document doc = loadPolicyAsDocument( basePolicy );
-			applyStructToDocument( doc, config, isMerge );
-			return parsePolicyFromDocument( doc );
+			Policy existingPolicy = POLICY_CACHE.putIfAbsent( cacheKey, builtPolicy );
+			return existingPolicy != null ? existingPolicy : builtPolicy;
 		} catch ( BoxRuntimeException e ) {
 			throw e;
 		} catch ( Exception e ) {
 			throw new BoxRuntimeException( "Error building policy from struct", e );
 		}
+	}
+
+	/**
+	 * Clear cached struct-based policies.
+	 */
+	public static void clearPolicyCache() {
+		POLICY_CACHE.clear();
+	}
+
+	/**
+	 * Remove a specific struct-based policy from the cache.
+	 *
+	 * @param config The struct policy configuration to evict
+	 */
+	public static void removePolicyFromCache( IStruct config ) {
+		POLICY_CACHE.remove( buildConfigCacheKey( config ) );
+	}
+
+	/**
+	 * Build a deterministic cache key for a policy config.
+	 */
+	private static String buildConfigCacheKey( IStruct config ) {
+		StringBuilder sb = new StringBuilder();
+		for ( Key key : CONFIG_KEYS ) {
+			if ( config.containsKey( key ) ) {
+				appendLengthPrefixed( sb, key.getName() );
+				appendDeterministicValue( sb, config.get( key ) );
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * Append a deterministic representation of nested values used in policy config.
+	 */
+	private static void appendDeterministicValue( StringBuilder sb, Object value ) {
+		if ( value == null ) {
+			sb.append( 'N' );
+			return;
+		}
+
+		if ( value instanceof IStruct structValue ) {
+			sb.append( 'S' ).append( '{' );
+			List<Key> sortedKeys = new ArrayList<>( structValue.keySet() );
+			sortedKeys.sort( Comparator.comparing( Key::getName, String.CASE_INSENSITIVE_ORDER ).thenComparing( Key::getName ) );
+			for ( Key key : sortedKeys ) {
+				appendLengthPrefixed( sb, key.getName() );
+				appendDeterministicValue( sb, structValue.get( key ) );
+			}
+			sb.append( '}' );
+			return;
+		}
+
+		if ( value instanceof Array arrayValue ) {
+			sb.append( 'A' ).append( '[' );
+			for ( Object item : arrayValue ) {
+				appendDeterministicValue( sb, item );
+			}
+			sb.append( ']' );
+			return;
+		}
+
+		sb.append( 'V' );
+		appendLengthPrefixed( sb, StringCaster.cast( value ) );
+	}
+
+	/**
+	 * Append length-prefixed text to avoid key collisions in concatenated cache keys.
+	 */
+	private static void appendLengthPrefixed( StringBuilder sb, String value ) {
+		sb.append( value.length() ).append( ':' ).append( value ).append( ';' );
 	}
 
 	// ==========================================
