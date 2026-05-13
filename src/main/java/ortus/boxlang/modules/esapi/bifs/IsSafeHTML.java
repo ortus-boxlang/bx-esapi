@@ -84,13 +84,15 @@ public class IsSafeHTML extends BIF {
 
 	/**
 	 * Resolve a policy argument to a Policy object.
+	 *
+	 * @param policyArg The policy argument, which can be a string or struct
+	 * @param force     If true and the policyArg is a struct, evict the cached compiled policy for that config and rebuild it
+	 *
+	 * @return The resolved Policy object
 	 */
 	private Policy resolvePolicy( Object policyArg, boolean force ) {
 		if ( policyArg instanceof IStruct structPolicy ) {
-			if ( force ) {
-				AntiSamyUtil.removePolicyFromCache( structPolicy );
-			}
-			return AntiSamyUtil.buildPolicyFromStruct( structPolicy );
+			return AntiSamyUtil.buildPolicyFromStruct( structPolicy, force );
 		}
 
 		String policy = policyArg.toString().trim();

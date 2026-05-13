@@ -97,7 +97,10 @@ public class GetSafeHTMLTest extends BaseIntegrationTest {
 		    "directives", Struct.of( "maxInputSize", "100000" )
 		);
 
+		AntiSamyUtil.clearPolicyCache();
+		assertThat( AntiSamyUtil.getPolicyCacheSize() ).isEqualTo( 0 );
 		Policy firstPolicy = AntiSamyUtil.buildPolicyFromStruct( policyConfig );
+		assertThat( AntiSamyUtil.getPolicyCacheSize() ).isEqualTo( 1 );
 
 		variables.put( Key.of( "policyConfig" ), policyConfig );
 		runtime.executeSource(
@@ -105,10 +108,10 @@ public class GetSafeHTMLTest extends BaseIntegrationTest {
 		    context
 		);
 
-		Policy secondPolicy = AntiSamyUtil.buildPolicyFromStruct( policyConfig );
+		AntiSamyUtil.buildPolicyFromStruct( policyConfig );
 
 		assertThat( variables.getAsString( result ) ).isEqualTo( "<b>hello</b>" );
-		assertThat( secondPolicy ).isNotSameInstanceAs( firstPolicy );
+		assertThat( AntiSamyUtil.getPolicyCacheSize() ).isEqualTo( 1 );
 	}
 
 	@DisplayName( "It can override directives via a struct policy with basePolicy" )

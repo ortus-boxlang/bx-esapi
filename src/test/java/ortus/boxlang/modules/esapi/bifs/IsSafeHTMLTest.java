@@ -4,7 +4,6 @@ import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.owasp.validator.html.Policy;
 
 import ortus.boxlang.modules.esapi.BaseIntegrationTest;
 import ortus.boxlang.modules.esapi.util.AntiSamyUtil;
@@ -125,8 +124,10 @@ public class IsSafeHTMLTest extends BaseIntegrationTest {
 		    "basePolicy", "ebay",
 		    "directives", Struct.of( "maxInputSize", "100000" )
 		);
-
-		Policy firstPolicy = AntiSamyUtil.buildPolicyFromStruct( policyConfig );
+		AntiSamyUtil.clearPolicyCache();
+		assertThat( AntiSamyUtil.getPolicyCacheSize() ).isEqualTo( 0 );
+		AntiSamyUtil.buildPolicyFromStruct( policyConfig );
+		assertThat( AntiSamyUtil.getPolicyCacheSize() ).isEqualTo( 1 );
 
 		variables.put( Key.of( "policyConfig" ), policyConfig );
 		runtime.executeSource(
@@ -134,10 +135,8 @@ public class IsSafeHTMLTest extends BaseIntegrationTest {
 		    context
 		);
 
-		Policy secondPolicy = AntiSamyUtil.buildPolicyFromStruct( policyConfig );
-
 		assertThat( variables.get( result ) ).isEqualTo( true );
-		assertThat( secondPolicy ).isNotSameInstanceAs( firstPolicy );
+		assertThat( AntiSamyUtil.getPolicyCacheSize() ).isEqualTo( 1 );
 	}
 
 }

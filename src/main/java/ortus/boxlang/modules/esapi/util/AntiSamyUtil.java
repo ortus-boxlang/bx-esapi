@@ -56,37 +56,37 @@ public class AntiSamyUtil {
 	/**
 	 * Default policy
 	 */
-	public static final String	DEFAULT_POLICY				= "ebay";
+	public static final String								DEFAULT_POLICY				= "ebay";
 
 	/**
 	 * The default override mode
 	 */
-	public static final String	DEFAULT_OVERRIDE_MODE		= "merge";
+	public static final String								DEFAULT_OVERRIDE_MODE		= "merge";
 
 	// Struct keys used for policy struct configuration
-	private static final Key	KEY_BASE_POLICY				= Key.of( "basePolicy" );
-	private static final Key	KEY_OVERRIDE_MODE			= Key.of( "overrideMode" );
-	private static final Key	KEY_DIRECTIVES				= Key.of( "directives" );
-	private static final Key	KEY_ALLOW_TAGS				= Key.of( "allowTags" );
-	private static final Key	KEY_TAG_RULES				= Key.of( "tagRules" );
-	private static final Key	KEY_GLOBAL_ATTRIBUTES		= Key.of( "globalAttributes" );
-	private static final Key	KEY_DYNAMIC_ATTRIBUTES		= Key.of( "dynamicAttributes" );
-	private static final Key	KEY_CSS_RULES				= Key.of( "cssRules" );
-	private static final Key	KEY_ALLOWED_EMPTY_TAGS		= Key.of( "allowedEmptyTags" );
-	private static final Key	KEY_REQUIRE_CLOSING_TAGS	= Key.of( "requireClosingTags" );
-	private static final Key	KEY_TAGS_TO_ENCODE			= Key.of( "tagsToEncode" );
-	private static final Key	KEY_ACTION					= Key.of( "action" );
-	private static final Key	KEY_ATTRIBUTES				= Key.of( "attributes" );
-	private static final Key	KEY_REGEXPS					= Key.of( "regexps" );
-	private static final Key	KEY_ALLOWED_VALUES			= Key.of( "allowedValues" );
-	private static final Key	KEY_ON_INVALID				= Key.of( "onInvalid" );
-	private static final Key	KEY_DESCRIPTION				= Key.of( "description" );
-	private static final Key	KEY_SHORTHAND_REFS			= Key.of( "shorthandRefs" );
+	private static final Key								KEY_BASE_POLICY				= Key.of( "basePolicy" );
+	private static final Key								KEY_OVERRIDE_MODE			= Key.of( "overrideMode" );
+	private static final Key								KEY_DIRECTIVES				= Key.of( "directives" );
+	private static final Key								KEY_ALLOW_TAGS				= Key.of( "allowTags" );
+	private static final Key								KEY_TAG_RULES				= Key.of( "tagRules" );
+	private static final Key								KEY_GLOBAL_ATTRIBUTES		= Key.of( "globalAttributes" );
+	private static final Key								KEY_DYNAMIC_ATTRIBUTES		= Key.of( "dynamicAttributes" );
+	private static final Key								KEY_CSS_RULES				= Key.of( "cssRules" );
+	private static final Key								KEY_ALLOWED_EMPTY_TAGS		= Key.of( "allowedEmptyTags" );
+	private static final Key								KEY_REQUIRE_CLOSING_TAGS	= Key.of( "requireClosingTags" );
+	private static final Key								KEY_TAGS_TO_ENCODE			= Key.of( "tagsToEncode" );
+	private static final Key								KEY_ACTION					= Key.of( "action" );
+	private static final Key								KEY_ATTRIBUTES				= Key.of( "attributes" );
+	private static final Key								KEY_REGEXPS					= Key.of( "regexps" );
+	private static final Key								KEY_ALLOWED_VALUES			= Key.of( "allowedValues" );
+	private static final Key								KEY_ON_INVALID				= Key.of( "onInvalid" );
+	private static final Key								KEY_DESCRIPTION				= Key.of( "description" );
+	private static final Key								KEY_SHORTHAND_REFS			= Key.of( "shorthandRefs" );
 
 	/**
 	 * Top-level config keys in deterministic order for cache key generation.
 	 */
-	private static final Key[]	CONFIG_KEYS				= new Key[] {
+	private static final Key[]								CONFIG_KEYS					= new Key[] {
 	    KEY_BASE_POLICY,
 	    KEY_OVERRIDE_MODE,
 	    KEY_DIRECTIVES,
@@ -103,12 +103,12 @@ public class AntiSamyUtil {
 	/**
 	 * Cache for policies built from struct configs.
 	 */
-	private static final ConcurrentHashMap<String, Policy>	POLICY_CACHE		= new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, Policy>	POLICY_CACHE				= new ConcurrentHashMap<>();
 
 	/**
 	 * Available Policies in the AntiSamy library
 	 */
-	public static final IStruct	POLICIES					= Struct.of(
+	public static final IStruct								POLICIES					= Struct.of(
 	    "anythinggoes", getPolicyURL( "/antisamy-anythinggoes.xml" ),
 	    "ebay", getPolicyURL( "/antisamy-ebay.xml" ),
 	    "myspace", getPolicyURL( "/antisamy-myspace.xml" ),
@@ -170,10 +170,28 @@ public class AntiSamyUtil {
 	 * @return The built Policy
 	 */
 	public static Policy buildPolicyFromStruct( IStruct config ) {
+		return buildPolicyFromStruct( config, false );
+	}
+
+	/**
+	 * Build (or retrieve from cache) an AntiSamy Policy from a BoxLang struct.
+	 * When {@code force} is {@code true} the cache check is skipped, a fresh policy
+	 * is always built, and the cache entry is overwritten with the new instance.
+	 *
+	 * @param config The struct configuration
+	 * @param force  When true, bypass the cache and rebuild unconditionally
+	 *
+	 * @return The built Policy
+	 */
+	public static Policy buildPolicyFromStruct( IStruct config, boolean force ) {
 		String cacheKey = buildConfigCacheKey( config );
-		Policy cachedPolicy = POLICY_CACHE.get( cacheKey );
-		if ( cachedPolicy != null ) {
-			return cachedPolicy;
+
+		// If not forcing a rebuild, check if a policy for this config already exists in the cache and return it if found
+		if ( !force ) {
+			Policy cachedPolicy = POLICY_CACHE.get( cacheKey );
+			if ( cachedPolicy != null ) {
+				return cachedPolicy;
+			}
 		}
 
 		String	basePolicy		= StringCaster.cast( config.getOrDefault( KEY_BASE_POLICY, DEFAULT_POLICY ) );
@@ -194,8 +212,9 @@ public class AntiSamyUtil {
 				builtPolicy = parsePolicyFromDocument( doc );
 			}
 
-			Policy existingPolicy = POLICY_CACHE.putIfAbsent( cacheKey, builtPolicy );
-			return existingPolicy != null ? existingPolicy : builtPolicy;
+			// Overwrite any existing cached entry with the freshly built policy
+			POLICY_CACHE.put( cacheKey, builtPolicy );
+			return builtPolicy;
 		} catch ( BoxRuntimeException e ) {
 			throw e;
 		} catch ( Exception e ) {
@@ -208,6 +227,13 @@ public class AntiSamyUtil {
 	 */
 	public static void clearPolicyCache() {
 		POLICY_CACHE.clear();
+	}
+
+	/**
+	 * How many policies in cache
+	 */
+	public static int getPolicyCacheSize() {
+		return POLICY_CACHE.size();
 	}
 
 	/**
