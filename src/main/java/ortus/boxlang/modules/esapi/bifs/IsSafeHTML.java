@@ -42,7 +42,8 @@ public class IsSafeHTML extends BIF {
 		super();
 		declaredArguments = new Argument[] {
 		    new Argument( true, Argument.STRING, Key.string ),
-		    new Argument( false, Argument.ANY, KeyDirectory.policy, "" )
+		    new Argument( false, Argument.ANY, KeyDirectory.policy, "" ),
+		    new Argument( false, Argument.BOOLEAN, KeyDirectory.force, false )
 		};
 	}
 
@@ -61,14 +62,17 @@ public class IsSafeHTML extends BIF {
 	 *
 	 * @arguments.policy The policy to use: a string name, file path, or a struct for programmatic configuration
 	 *
+	 * @arguments.force When true and using a struct policy, evicts it from cache and rebuilds it
+	 *
 	 * @return True if the HTML is safe, false otherwise
 	 */
 	public Object _invoke( IBoxContext context, ArgumentsScope arguments ) {
 		String	input		= arguments.getAsString( Key.string ).trim();
 		Object	policyArg	= arguments.get( KeyDirectory.policy );
+		boolean	force		= arguments.getAsBoolean( KeyDirectory.force );
 
 		try {
-			Policy			loadedPolicy	= resolvePolicy( policyArg );
+			Policy			loadedPolicy	= resolvePolicy( policyArg, force );
 			CleanResults	results			= new AntiSamy().scan( input, loadedPolicy );
 			return results.getNumberOfErrors() == 0;
 		} catch ( BoxRuntimeException e ) {
@@ -80,10 +84,15 @@ public class IsSafeHTML extends BIF {
 
 	/**
 	 * Resolve a policy argument to a Policy object.
+	 *
+	 * @param policyArg The policy argument, which can be a string or struct
+	 * @param force     If true and the policyArg is a struct, evict the cached compiled policy for that config and rebuild it
+	 *
+	 * @return The resolved Policy object
 	 */
-	private Policy resolvePolicy( Object policyArg ) {
+	private Policy resolvePolicy( Object policyArg, boolean force ) {
 		if ( policyArg instanceof IStruct structPolicy ) {
-			return AntiSamyUtil.buildPolicyFromStruct( structPolicy );
+			return AntiSamyUtil.buildPolicyFromStruct( structPolicy, force );
 		}
 
 		String policy = policyArg.toString().trim();

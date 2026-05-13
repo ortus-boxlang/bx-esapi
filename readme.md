@@ -131,15 +131,17 @@ This module contributes the following ESAPI decoding BIFs:
 
 This module contributes these remaining ESAPI BIFs:
 
-* `getSafeHTML( string, [policy='ebay'], [throwOnError=false] )` - Sanitize HTML content using the AntiSamy library
+* `getSafeHTML( string, [policy='ebay'], [throwOnError=false], [force=false] )` - Sanitize HTML content using the AntiSamy library
   * `string` - The HTML string to sanitize
   * `policy` - The policy to use for sanitization.  Can be a **string** (named policy or file path) or a **struct** for programmatic policy configuration.  The default is `'ebay'`.
     * **String values**: `anythinggoes`, `ebay`, `myspace`, `slashdot`, `tinymce`, or an absolute path to a custom XML policy file.
     * **Struct values**: See [Struct Policy Configuration](#struct-policy-configuration) below.
   * `throwOnError` - If `true`, throws an exception when the HTML violates the policy rules.  If `false` (default), silently returns the sanitized HTML.
-* `isSafeHTML( string, [policy='ebay'] )` - Validate HTML content using the AntiSamy library
+   	* `force` - If `true` and `policy` is a struct, evicts the cached compiled policy for that config and rebuilds it before scanning.
+* `isSafeHTML( string, [policy='ebay'], [force=false] )` - Validate HTML content using the AntiSamy library
   * `string` - The HTML string to validate
   * `policy` - Same as `getSafeHTML()` above.  Can be a string or struct.
+   	* `force` - Same as `getSafeHTML()` above.  Applies only to struct policies.
 * `sanitizeHTML( string, [policy='ALL'] )` - Sanitizes unsafe HTML to protect against XSS attacks (uses the OWASP Java HTML Sanitizer, not AntiSamy)
   * `string` - The HTML string to sanitize
   * `policy` - The policy to use for sanitization. The default is 'ALL', which is the most restrictive policy. The available policies are: `BLOCKS, FORMATTING, IMAGES, LINKS, STYLES, TABLES`.  You can also pass a `PolicyFactory` object to use a custom policy (https://javadoc.io/static/com.googlecode.owasp-java-html-sanitizer/owasp-java-html-sanitizer/20191001.1/org/owasp/html/PolicyFactory.html)
@@ -220,12 +222,24 @@ This module contributes these remaining ESAPI BIFs:
 	if( isSafeHTML( form.comment, { basePolicy: "slashdot" } ) ) {
 		// comment is safe
 	}
+
+	// Force recreation when needed (struct policy only)
+	comment = getSafeHTML( form.comment, {
+		basePolicy: "ebay",
+		directives: { maxInputSize: 500000 }
+	}, false, true );
+
+	if( isSafeHTML( form.comment, { basePolicy: "slashdot" }, true ) ) {
+		// policy was rebuilt from struct for this call
+	}
 </bx:script>
 ```
 
 ### Struct Policy Configuration
 
 Instead of writing XML policy files, you can pass a struct to `getSafeHTML()` or `isSafeHTML()` to configure an AntiSamy policy programmatically.  The `basePolicy` defaults to `"ebay"` if not specified, so passing an empty struct is equivalent to using the default string policy.
+
+Struct policies are cached after compilation for reuse across calls.  Use the `force=true` argument in `getSafeHTML()` or `isSafeHTML()` to evict and rebuild a specific struct policy configuration when needed.
 
 #### Struct Keys
 

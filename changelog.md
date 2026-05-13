@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Improvements
+
+- Bump com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer from 20260102.1 to 20260313.1
+- Added struct policy caching and eviction capabilities for `getSafeHTML()` and `isSafeHTML()`
+- Added `force` boolean argument to `getSafeHTML()` and `isSafeHTML()` for struct policies to evict cached compiled policy entries and rebuild on demand
+
+### Fixed
+
+- Fixed changelog so we could publish github releases.
+
 ## [1.8.0] - 2026-05-12
 
 ### Added
@@ -28,20 +38,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.5.0] - 2025-06-09
 
-## [1.4.0] - 2025-05-26
-
 ### Added
 
 - Bumps org.owasp.esapi:esapi from 2.6.2.0 to 2.7.0.0.
 - Enabled `encodeForSQL()` due to being off by default in 2.7
-
-## [1.5.0] - 2025-06-09
-
-## [1.4.0] - 2025-05-26
-
-### Added
-
-- Bump org.owasp.esapi:esapi from 2.6.1.0 to 2.6.2.0
 
 ## [1.4.0] - 2025-05-26
 

@@ -36,6 +36,7 @@ public class KeyDirectory {
 	public static final Key	encodeForXML			= Key.of( "encodeForXML" );
 	public static final Key	encodeForXMLAttribute	= Key.of( "encodeForXMLAttribute" );
 	public static final Key	encodeForXPath			= Key.of( "encodeForXPath" );
+	public static final Key	force					= Key.of( "force" );
 	public static final Key	html					= Key.of( "html" );
 	public static final Key	htmlAttribute			= Key.of( "htmlAttribute" );
 	public static final Key	javascript				= Key.of( "javascript" );
