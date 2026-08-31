@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-31
+
 ## [1.9.0] - 2026-05-13
 
 ### Improvements
@@ -97,7 +99,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded to latest ESAPI due to CVE
 - First iteration of this module
 
-[unreleased]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.9.0...HEAD
+[unreleased]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.10.0...HEAD
+[1.10.0]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/ortus-boxlang/bx-esapi/compare/v1.6.0...v1.7.0
