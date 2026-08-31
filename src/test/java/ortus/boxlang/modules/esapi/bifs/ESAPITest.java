@@ -45,6 +45,22 @@ public class ESAPITest extends BaseIntegrationTest {
 		assertEquals( "&lt;test&gt;", variables.get( result ) );
 	}
 
+	@DisplayName( "It can encode for HTML with canonicalize on double-encoded input without throwing" )
+	@Test
+	public void testEncodeForHTMLWithCanonicalizeDoubleEncoded() {
+		// %2526 canonicalizes to &, which is then encoded as &amp;
+		runtime.executeSource( "result = encodeForHTML( '%2526', true )", context );
+		assertEquals( "&amp;", variables.get( result ) );
+	}
+
+	@DisplayName( "It can encode for HTML with canonicalize on mixed double-encoded input without throwing" )
+	@Test
+	public void testEncodeForHTMLWithCanonicalizeMixedEncoded() {
+		// %26lt%3B canonicalizes to <, which is then encoded as &lt;
+		runtime.executeSource( "result = encodeForHTML( '%26lt%3B', true )", context );
+		assertEquals( "&lt;", variables.get( result ) );
+	}
+
 	@DisplayName( "EncodeForX methods return nulls unmodified" )
 	@Test
 	public void testEncodeForHTMLWithNull() {
@@ -116,6 +132,14 @@ public class ESAPITest extends BaseIntegrationTest {
 	public void testEncodeForSQL() {
 		runtime.executeSource( "result = encodeForSQL( \"' or '1'='1\", 'mysql', false )", context );
 		assertEquals( "\\' or \\'1\\'\\=\\'1", variables.get( result ) );
+	}
+
+	@DisplayName( "It can encode for SQL with canonicalize on double-encoded input without throwing" )
+	@Test
+	public void testEncodeForSQLWithCanonicalize() {
+		// %2527 canonicalizes to ', which is then encoded as \' in mysql mode
+		runtime.executeSource( "result = encodeForSQL( '%2527', 'mysql', true )", context );
+		assertEquals( "\\'", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encodeFor" )
