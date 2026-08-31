@@ -85,9 +85,13 @@ public class EncodeForSQL extends BIF {
 		// Get the ESAPI encoder
 		Encoder	encoder			= ESAPI.encoder();
 
-		// Canonicalize the input string if requested
+		// Canonicalize the input string if requested.
+		// Use restrictMultiple=false and restrictMixed=false so canonicalization always
+		// normalizes the string without throwing IntrusionException, regardless of the
+		// Encoder.AllowMultipleEncoding/Encoder.AllowMixedEncoding settings in ESAPI.properties.
+		// This matches Adobe ColdFusion's documented default behavior for canonicalize=true.
 		if ( canonicalize ) {
-			str = encoder.canonicalize( str );
+			str = encoder.canonicalize( str, false, false );
 		}
 
 		return encoder.encodeForSQL( getCodec( dialect ), str );
