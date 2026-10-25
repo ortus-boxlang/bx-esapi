@@ -21,6 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import ortus.boxlang.modules.esapi.BaseIntegrationTest;
+import ortus.boxlang.runtime.scopes.Key;
 
 public class ESAPITest extends BaseIntegrationTest {
 
@@ -97,6 +98,48 @@ public class ESAPITest extends BaseIntegrationTest {
 	public void testEncodeForURL() {
 		runtime.executeSource( "result = encodeForURL( 'http://www.example.com/?foo=bar', false )", context );
 		assertEquals( "http%3A%2F%2Fwww.example.com%2F%3Ffoo%3Dbar", variables.get( result ) );
+	}
+
+	@DisplayName( "BL-1119: URL canonicalization accepts mixed encoding and returns encoded output" )
+	@Test
+	public void testEncodeForURLWithCanonicalizeMixedEncoding() {
+		// Pass the reported input as data so BoxLang does not interpret its # character.
+		variables.put( Key.of( "urlInput" ), "exam%20p le (fo%2Fo)+,!@#$%^&*()_+~;:.txt" );
+		runtime.executeSource( "result = encodeForURL( urlInput, true )", context );
+		// The configured Windows codec also canonicalizes ^& to & before URL encoding.
+		assertEquals( "exam+p+le+%28fo%2Fo%29%2B%2C%21%40%23%24%25%26*%28%29_%2B%7E%3B%3A.txt", variables.get( result ) );
+	}
+
+	@DisplayName( "URL canonicalization accepts double encoding without undoing final URL escaping" )
+	@Test
+	public void testEncodeForURLWithCanonicalizeDoubleEncoding() {
+		runtime.executeSource( "result = encodeForURL( 'a%252Fb', true )", context );
+		assertEquals( "a%2Fb", variables.get( result ) );
+	}
+
+	@DisplayName( "URL canonicalization preserves escaping of reserved characters" )
+	@Test
+	public void testEncodeForURLWithCanonicalizeReservedCharacters() {
+		runtime.executeSource( "result = encodeForURL( 'a/b+c d', true )", context );
+		assertEquals( "a%2Fb%2Bc+d", variables.get( result ) );
+	}
+
+	@DisplayName( "URL encoding leaves canonicalization disabled by default" )
+	@Test
+	public void testEncodeForURLWithoutCanonicalize() {
+		runtime.executeSource( "result = encodeForURL( 'a%2Fb', false )", context );
+		assertEquals( "a%252Fb", variables.get( result ) );
+		runtime.executeSource( "result = encodeForURL( 'a%2Fb' )", context );
+		assertEquals( "a%252Fb", variables.get( result ) );
+	}
+
+	@DisplayName( "URL alias and member calls use the same canonicalization behavior" )
+	@Test
+	public void testEncodeForURLCanonicalizeAliasAndMember() {
+		runtime.executeSource( "result = URLEncode( 'a%252Fb', true )", context );
+		assertEquals( "a%2Fb", variables.get( result ) );
+		runtime.executeSource( "result = 'a%252Fb'.encodeForURL( true )", context );
+		assertEquals( "a%2Fb", variables.get( result ) );
 	}
 
 	@DisplayName( "It can encode for URL using the Lucee alias" )
